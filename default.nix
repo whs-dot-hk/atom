@@ -3,6 +3,7 @@ let
   filterMap = scopedImport { std = builtins; } ./std/set/filterMap.nix;
   parse = scopedImport { std = builtins; } ./std/file/parse.nix;
   compose = import ./.;
+  cond = set: if set._if or true then set else { };
 
   filterMod = builtins.filterSource (
     path: type:
@@ -32,8 +33,14 @@ let
                 outPath = filterMod dir;
               };
             }
-            // (if super != { } then { inherit super; } else { })
-            // (if pub != { } then { inherit pub; } else { })
+            // cond {
+              _if = super != { };
+              inherit super;
+            }
+            // cond {
+              _if = pub != { };
+              inherit pub;
+            }
           );
           mod =
             if contents ? "mod.nix" && contents."mod.nix" == "regular" then
@@ -48,7 +55,15 @@ let
             file = parse name;
           in
           if type == "directory" then
-            { ${name} = f self path; }
+            {
+              ${name} = f (
+                self
+                // cond {
+                  _if = super != { };
+                  inherit super;
+                }
+              ) path;
+            }
           else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
             { ${file.name} = import' "${path}"; }
           else
