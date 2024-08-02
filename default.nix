@@ -13,6 +13,9 @@ let
   );
 
 in
+{
+  pub ? { },
+}:
 dir:
 let
   atom = fix (
@@ -24,12 +27,13 @@ let
           import' = scopedImport (
             {
               inherit atom;
-              std = compose ./std // builtins;
+              std = compose { } ./std // builtins;
               self = self // {
                 outPath = filterMod dir;
               };
             }
             // (if super != { } then { inherit super; } else { })
+            // (if pub != { } then { inherit pub; } else { })
           );
           mod =
             if contents ? "mod.nix" && contents."mod.nix" == "regular" then

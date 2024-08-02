@@ -1,1 +1,1 @@
-import ../. ./bld
+import ../. { } ./bld
