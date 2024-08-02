@@ -15,13 +15,17 @@ let
 
 in
 {
-  pub ? { },
+  extern ? { },
 }:
 dir:
 let
   std = compose { } ./std // builtins;
+  atom' = builtins.removeAttrs (extern // atom // { inherit extern; }) [
+    "atom"
+    (baseNameOf dir)
+  ];
   atom = fix (
-    f: super: dir:
+    f: pre: dir:
     let
       contents = builtins.readDir dir;
 
@@ -31,18 +35,15 @@ let
 
       scope = scopedImport (
         {
-          inherit atom std;
-          self = self // {
+          inherit std;
+          atom = atom';
+          mod = builtins.removeAttrs self [ "mod" ] // {
             outPath = filterMod dir;
           };
         }
         // cond {
-          _if = super != { };
-          inherit super;
-        }
-        // cond {
-          _if = pub != { };
-          inherit pub;
+          _if = pre != { };
+          inherit pre;
         }
       );
 
@@ -57,8 +58,8 @@ let
             ${name} = f (
               self
               // cond {
-                _if = super != { };
-                inherit super;
+                _if = pre != { };
+                inherit pre;
               }
             ) path;
           }

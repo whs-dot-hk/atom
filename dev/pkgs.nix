@@ -1,4 +1,4 @@
 let
-  inherit (pub.pins) nixpkgs;
+  inherit (atom.pins) nixpkgs;
 in
 import nixpkgs { }

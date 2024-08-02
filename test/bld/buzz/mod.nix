@@ -1,5 +1,5 @@
 {
   foo = 1;
-  bar = super.foo + 2;
-  baz = self.bar + 4;
+  bar = pre.foo + 2;
+  baz = mod.bar + 4;
 }

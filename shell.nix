@@ -1,6 +1,6 @@
 let
   dev = import ./. {
-    pub = {
+    extern = {
       pins = import ./npins;
     };
   } ./dev;

@@ -16,7 +16,7 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 - **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
 - **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
 - **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and flexible.
-- **Scoping**: Each module and member has access to `self`, `super`, `atom`, `pub` and `std`.
+- **Scoping**: Each module and member has access to `mod`, `pre`, `atom`, and `std`.
 - **Standard Library**: Includes a standard library (`std`) augmented with `builtins`.
 
 ## How It Works
@@ -27,11 +27,10 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
    - Subdirectories with `mod.nix`: Treated as nested modules.
 
 2. **Scoping**:
-   - `self`: Current module, includes `outPath` for accessing non-Nix files.
-   - `super`: Parent module (if applicable).
-   - `atom`: Top-level module.
+   - `mod`: Current module, includes `outPath` for accessing non-Nix files.
+   - `pre`: Parent module (if applicable).
+   - `atom`: Top-level module and external dependencies.
    - `std`: Standard library and `builtins`.
-   - `pub`: External resources, such as other atoms, free-form nix expressions, remote sources, etc.
 
 3. **Composition**: Modules are composed recursively, with `mod.nix` contents taking precedence.
 
@@ -53,7 +52,7 @@ in
 * Break out large functions or code blocks into their own files
 * Organize related functionality into subdirectories with their own "mod.nix" files.
 * Leverage provided scopes for clean, modular code.
-* Use `"${self}"` when needing to access non-Nix files within a module.
+* Use `"${mod}/foo.nix"` when needing to access non-Nix files within a module.
 
 ## Future Work
 
