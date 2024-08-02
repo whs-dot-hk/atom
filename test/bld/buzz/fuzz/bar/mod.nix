@@ -1,5 +1,5 @@
 {
   foo = 1;
   bar = atom.foo + 2;
-  baz = self.bar + 4;
+  baz = mod.bar + 4;
 }
