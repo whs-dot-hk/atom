@@ -14,7 +14,9 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 - **Modular Structure**: Organize Nix code into directories, each defined by a `mod.nix` file.
 - **Automatic Importing**: Nix files in a module directory are automatically imported.
 - **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
-- **Scoping**: Each module and member has access to `self`, `super`, `atom`, and `std`.
+- **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
+- **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and flexible.
+- **Scoping**: Each module and member has access to `self`, `super`, `atom`, `pub` and `std`.
 - **Standard Library**: Includes a standard library (`std`) augmented with `builtins`.
 
 ## How It Works
@@ -29,6 +31,7 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
    - `super`: Parent module (if applicable).
    - `atom`: Top-level module.
    - `std`: Standard library and `builtins`.
+   - `pub`: External resources, such as other atoms, free-form nix expressions, remote sources, etc.
 
 3. **Composition**: Modules are composed recursively, with `mod.nix` contents taking precedence.
 
