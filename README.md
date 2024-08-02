@@ -4,7 +4,10 @@
 
 # Nix Module System
 
-A flexible and efficient module system for Nix, providing structured organization and composition of Nix code with strong isolation by composing modules into discreet units referred to as "atoms" (akin to cargo crates, etc.).
+A flexible and efficient module system for Nix, providing structured organization and composition of Nix code with strong isolation. By composing modules into discreet units referred to as "atoms" (akin to cargo crates, etc.), one can avoid the excessive cost of Nix boilerplate and focus on actual code, without sacrificing performance.
+
+Crucially, the system is designed to aid static analysis in the future, so one can determine useful properties about your Nix
+code without having to perform a full evaluation. This could be used, e.g. to ship off Nix files for evaluation on a more powerful remote machine, or for having a complete view of your code (including auto-complete) in your LSP.
 
 ## Key Features
 
