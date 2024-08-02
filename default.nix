@@ -2,8 +2,8 @@ let
   fix = import ./std/fix.nix;
   filterMap = scopedImport { std = builtins; } ./std/set/filterMap.nix;
   parse = scopedImport { std = builtins; } ./std/file/parse.nix;
+  cond = import ./std/set/cond.nix;
   compose = import ./.;
-  cond = set: if set._if or true then set else { };
 
   filterMod = builtins.filterSource (
     path: type:
