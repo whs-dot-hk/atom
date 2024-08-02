@@ -19,59 +19,58 @@ in
 }:
 dir:
 let
+  std = compose { } ./std // builtins;
   atom = fix (
     f: super: dir:
     let
       contents = builtins.readDir dir;
-      self =
+
+      hasMod = contents."mod.nix" or null == "regular";
+
+      mod = if hasMod then scope "${dir + "/mod.nix"}" else { };
+
+      scope = scopedImport (
+        {
+          inherit atom std;
+          self = self // {
+            outPath = filterMod dir;
+          };
+        }
+        // cond {
+          _if = super != { };
+          inherit super;
+        }
+        // cond {
+          _if = pub != { };
+          inherit pub;
+        }
+      );
+
+      g =
+        name: type:
         let
-          import' = scopedImport (
-            {
-              inherit atom;
-              std = compose { } ./std // builtins;
-              self = self // {
-                outPath = filterMod dir;
-              };
-            }
-            // cond {
-              _if = super != { };
-              inherit super;
-            }
-            // cond {
-              _if = pub != { };
-              inherit pub;
-            }
-          );
-          mod =
-            if contents ? "mod.nix" && contents."mod.nix" == "regular" then
-              import' "${dir + "/mod.nix"}"
-            else
-              { };
+          path = dir + "/${name}";
+          file = parse name;
         in
-        filterMap (
-          name: type:
-          let
-            path = dir + "/${name}";
-            file = parse name;
-          in
-          if type == "directory" then
-            {
-              ${name} = f (
-                self
-                // cond {
-                  _if = super != { };
-                  inherit super;
-                }
-              ) path;
-            }
-          else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
-            { ${file.name} = import' "${path}"; }
-          else
-            null # Ignore other file types
-        ) contents
-        // mod;
+        if type == "directory" then
+          {
+            ${name} = f (
+              self
+              // cond {
+                _if = super != { };
+                inherit super;
+              }
+            ) path;
+          }
+        else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
+          { ${file.name} = scope "${path}"; }
+        else
+          null # Ignore other file types
+      ;
+
+      self = filterMap g contents // mod;
     in
-    if !(contents."mod.nix" or null == "regular") then
+    if !hasMod then
       { } # Base case: no module
     else
       self
