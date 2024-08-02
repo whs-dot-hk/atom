@@ -8,3 +8,10 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Structural Integirty Test
         run: cd test && ./bld.sh
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nixbuild/nix-quick-install-action@v28
+      - name: Code Format Check
+        run: eval "$(nix print-dev-env -f shell.nix)" && treefmt --fail-on-change

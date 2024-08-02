@@ -42,6 +42,6 @@
     g = 5;
     h = 8;
   };
-  test = scopedImport {std = builtins;} "${../std/set/filterMap.nix}";
+  test = scopedImport { std = builtins; } "${../std/set/filterMap.nix}";
   x = builtins.readFile ./bld/bum;
 }

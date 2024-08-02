@@ -1,0 +1,11 @@
+[formatter.nix]
+command = "nixfmt"
+options = []
+includes = [ "*.nix" ]
+excludes = []
+
+[formatter.sh]
+command = "shfmt"
+options = []
+includes = [ "*.sh" ]
+excludes = []
