@@ -52,7 +52,10 @@ let
         ) contents
         // mod;
     in
-    self
+    if !(contents."mod.nix" or null == "regular") then
+      { } # Base case: no module
+    else
+      self
   ) { } dir;
 in
 atom
