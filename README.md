@@ -4,9 +4,9 @@
 
 # Nix Module System
 
-A flexible and efficient module system for Nix, providing structured organization and composition of Nix code with strong isolation. By composing modules into discreet units referred to as "atoms" (akin to cargo crates, etc.), one can avoid the excessive cost of Nix boilerplate and focus on actual code, without sacrificing performance.
+A flexible and efficient module system for Nix, providing structured organization and composition of Nix code with strong isolation. By composing modules into discreet units referred to as "atoms" (akin to cargo crates, etc.), one can avoid the excessive cost of Nix boilerplate and focus on actual code, without sacrificing performance or flexibility.
 
-Crucially, the system is designed to aid static analysis in the future, so one can determine useful properties about your Nix
+Crucially, the system is designed to aid static analysis, so one can determine useful properties about your Nix
 code without having to perform a full evaluation. This could be used, e.g. to ship off Nix files for evaluation on a more powerful remote machine, or for having a complete view of your code (including auto-complete) in your LSP.
 
 ## Key Features
@@ -14,7 +14,7 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 - **Modular Structure**: Organize Nix code into directories, each defined by a `mod.nix` file.
 - **Automatic Importing**: Nix files in a module directory are automatically imported.
 - **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
-- **Scoping**: Each module has access to `self`, `super`, `atom`, and `std`.
+- **Scoping**: Each module and member has access to `self`, `super`, `atom`, and `std`.
 - **Standard Library**: Includes a standard library (`std`) augmented with `builtins`.
 
 ## How It Works
@@ -56,5 +56,6 @@ in
 
 * private members
 * CLI with static analysis powers (eka)
+* Static manifest format
 * tooling integration (LSP, etc)
-* atom composition (remote atoms, mono-repos, etc)
+* atom composition (remote atoms, mono-repos, flake and legacy expression integration, etc)
