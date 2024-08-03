@@ -61,4 +61,3 @@ in
 * CLI with static analysis powers (eka)
 * Static manifest format
 * tooling integration (LSP, etc)
-* atom composition (remote atoms, mono-repos, flake and legacy expression integration, etc)
