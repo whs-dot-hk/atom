@@ -2,6 +2,7 @@ let
   fix = import ./std/fix.nix;
   filterMap = scopedImport { std = builtins; } ./std/set/filterMap.nix;
   parse = scopedImport { std = builtins; } ./std/file/parse.nix;
+  strToPath = scopedImport { std = builtins; } ./std/path/strToPath.nix;
   cond = import ./std/set/cond.nix;
   compose = import ./.;
 
@@ -42,8 +43,13 @@ let
   );
 
   atom = fix (
-    f: pre: dir:
+    f: pre: dir':
     let
+      # It is crucial that the directory is a path literal, not a string
+      # since the implicit copy to the /nix/store, which provides isolation,
+      # only happens for path literals.
+      dir = strToPath dir';
+
       contents = builtins.readDir dir;
 
       hasMod = contents."mod.nix" or null == "regular";
