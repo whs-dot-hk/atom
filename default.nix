@@ -11,7 +11,8 @@ let
     let
       file = parse (baseNameOf path);
     in
-    type == "regular" && file.ext or null != "nix"
+    (type == "regular" && file.ext or null != "nix")
+    || (type == "directory" && !builtins.pathExists "${path}/mod.nix")
   );
 
 in
