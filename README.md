@@ -36,6 +36,8 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 
 4. **Isolation**: Modules are imported into the Nix store, enforcing boundaries.
 
+5. **Encapsulation**: implementation details can be cleanly hidden with private module members by default. See: [#5](https://github.com/ekala-project/modules/pull/5)
+
 ## Usage
 
 ```nix
@@ -56,7 +58,6 @@ in
 
 ## Future Work
 
-* private members
 * CLI with static analysis powers (eka)
 * Static manifest format
 * tooling integration (LSP, etc)

@@ -24,6 +24,23 @@ let
     "atom"
     (baseNameOf dir)
   ];
+  stripPub =
+    s:
+    let
+      s' = builtins.match "^pub_(.*)" s;
+    in
+    if s' == null then s else builtins.head s';
+
+  rmPub = filterMap (k: v: { ${stripPub k} = v; });
+
+  filterPub = filterMap (
+    k: v:
+    let
+      s = stripPub k;
+    in
+    if s == k then null else { ${s} = v; }
+  );
+
   atom = fix (
     f: pre: dir:
     let
@@ -42,7 +59,7 @@ let
           };
         }
         // cond {
-          _if = pre != { };
+          _if = pre != null;
           inherit pre;
         }
       );
@@ -56,9 +73,9 @@ let
         if type == "directory" then
           {
             ${name} = f (
-              self
+              (rmPub self)
               // cond {
-                _if = pre != { };
+                _if = pre != null;
                 inherit pre;
               }
             ) path;
@@ -74,7 +91,7 @@ let
     if !hasMod then
       { } # Base case: no module
     else
-      self
-  ) { } dir;
+      filterPub self
+  ) null dir;
 in
 atom
