@@ -1,10 +1,10 @@
 {
-  pub_foo = 1;
+  Foo = 1;
   bar = atom.foo + 2;
   baz = mod.bar + 4;
-  pub_f = std.set.filterMap;
-  pub_file = builtins.readFile "${mod}/bum";
-  pub_buzz = mod.buzz;
-  pub_next = ./next; # should be a non-existant path: /nix/store/next
-  pub_bar = mod.bar;
+  F = std.set.filterMap;
+  File = builtins.readFile "${mod}/bum";
+  Buzz = mod.buzz;
+  Next = ./next; # should be a non-existant path: /nix/store/next
+  Bar = mod.bar;
 }

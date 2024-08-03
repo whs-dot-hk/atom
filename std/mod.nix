@@ -1,6 +1,7 @@
 {
-  pub_fix = mod.fix;
-  pub_file = mod.file;
-  pub_set = mod.set;
-  pub_path = mod.path;
+  Fix = mod.fix;
+  File = mod.file;
+  Set = mod.set;
+  Path = mod.path;
+  String = mod.string;
 }

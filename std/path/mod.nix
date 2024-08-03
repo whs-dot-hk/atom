@@ -1,1 +1,1 @@
-{ pub_strToPath = mod.strToPath; }
+{ StrToPath = mod.strToPath; }

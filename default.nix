@@ -3,9 +3,14 @@ let
   filterMap = scopedImport { std = builtins; } ./std/set/filterMap.nix;
   parse = scopedImport { std = builtins; } ./std/file/parse.nix;
   strToPath = scopedImport { std = builtins; } ./std/path/strToPath.nix;
+  toLowerCase = scopedImport rec {
+    std = builtins;
+    mod = scopedImport { inherit std mod; } ./std/string/mod.nix;
+  } ./std/string/toLowerCase.nix;
   cond = import ./std/set/cond.nix;
   compose = import ./.;
 
+  lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
   filterMod = builtins.filterSource (
     path: type:
     let
@@ -26,19 +31,11 @@ let
     "atom"
     (baseNameOf dir)
   ];
-  stripPub =
-    s:
-    let
-      s' = builtins.match "^pub_(.*)" s;
-    in
-    if s' == null then s else builtins.head s';
-
-  rmPub = filterMap (k: v: { ${stripPub k} = v; });
 
   filterPub = filterMap (
     k: v:
     let
-      s = stripPub k;
+      s = toLowerCase k;
     in
     if s == k then null else { ${s} = v; }
   );
@@ -61,9 +58,7 @@ let
         {
           inherit std;
           atom = atom';
-          mod = builtins.removeAttrs self [ "mod" ] // {
-            outPath = filterMod dir;
-          };
+          mod = lowerKeys (builtins.removeAttrs self [ "mod" ] // { outPath = filterMod dir; });
         }
         // cond {
           _if = pre != null;
@@ -80,7 +75,7 @@ let
         if type == "directory" then
           {
             ${name} = f (
-              (rmPub self)
+              (lowerKeys self)
               // cond {
                 _if = pre != null;
                 inherit pre;
