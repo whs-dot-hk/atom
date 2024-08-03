@@ -25,18 +25,19 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
    - `mod.nix`: Defines a module. Its presence is required for the directory to be treated as a module.
    - Other `.nix` files: Automatically imported as module members.
    - Subdirectories with `mod.nix`: Treated as nested modules.
+   - Capitalized outputs are public (everything else is private by default)
 
 2. **Scoping**:
    - `mod`: Current module, includes `outPath` for accessing non-Nix files.
-   - `pre`: Parent module (if applicable).
-   - `atom`: Top-level module and external dependencies.
+   - `pre`: Parent module (if applicable) with private members.
+   - `atom`: Top-level module and external dependencies with only public members.
    - `std`: Standard library and `builtins`.
 
 3. **Composition**: Modules are composed recursively, with `mod.nix` contents taking precedence.
 
 4. **Isolation**: Modules are imported into the Nix store, enforcing boundaries.
 
-5. **Encapsulation**: implementation details can be cleanly hidden with private module members by default. See: [#5](https://github.com/ekala-project/modules/pull/5)
+5. **Encapsulation**: implementation details can be cleanly hidden with private module members by default. See: [#5](https://github.com/ekala-project/modules/pull/5) [#6](https://github.com/ekala-project/modules/pull/6)
 
 ## Usage
 
