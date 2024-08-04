@@ -1,7 +1,10 @@
 str:
 let
   # strip off the first `/` of an absolute path
-  frag = std.substring 1 (-1) str;
+  # disgarding the string context of a store path should be safe here
+  # since if the path refers to a store path, the context will be readded
+  # if/when the path is turned back into a string
+  frag = std.unsafeDiscardStringContext (std.substring 1 (-1) str);
   # will fail if the string does not represent an absolute path
   # which is what we want since this function makes little sense otherwise
   validate = std.toPath str;
