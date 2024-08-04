@@ -26,7 +26,17 @@ in
 }:
 dir:
 let
-  std = compose { } ./std // builtins;
+  std =
+    compose { } ./std
+    // filterMap (
+      k: v:
+      if
+        builtins.match "^import|^scopedImport|^builtins|^fetch.*|^current.*|^nixPath|^storePath" k != null
+      then
+        null
+      else
+        { ${k} = v; }
+    ) builtins;
   atom' = builtins.removeAttrs (extern // atom // { inherit extern; }) [
     "atom"
     (baseNameOf dir)
@@ -54,17 +64,31 @@ let
 
       mod = if hasMod then scope "${dir + "/mod.nix"}" else { };
 
-      scope = scopedImport (
-        {
-          inherit std;
-          atom = atom';
-          mod = lowerKeys (builtins.removeAttrs self [ "mod" ] // { outPath = filterMod dir; });
-        }
-        // cond {
-          _if = pre != null;
-          inherit pre;
-        }
-      );
+      scope =
+        let
+          importErr = "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
+        in
+        scopedImport (
+          {
+            inherit std;
+            atom = atom';
+            mod = lowerKeys (builtins.removeAttrs self [ "mod" ] // { outPath = filterMod dir; });
+            # override builtins, so they can only be accessed via `std`
+            builtins = abort "Please access builtins uniformly via the `std` scope.";
+            import = abort importErr;
+            scopedImport = abort importErr;
+            __fetchurl = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
+            __currentSystem = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
+            __currentTime = abort "Accessing the current time is impure & illegal.";
+            __nixPath = abort "The NIX_PATH is an impure feature, and therefore illegal.";
+            __storePath = abort "Making explicit dependencies on store paths is illegal.";
+
+          }
+          // cond {
+            _if = pre != null;
+            inherit pre;
+          }
+        );
 
       g =
         name: type:

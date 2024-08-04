@@ -1,4 +1,1 @@
-{
-  Pkgs = mod.pkgs;
-  Shell = mod.shell;
-}
+{ Shell = mod.shell; }
