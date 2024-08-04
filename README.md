@@ -15,7 +15,7 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 - **Automatic Importing**: Nix files in a module directory are automatically imported.
 - **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
 - **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
-- **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and flexible.
+- **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and useful.
 - **Scoping**: Each module and member has access to `mod`, `pre`, `atom`, and `std`.
 - **Standard Library**: Includes a standard library (`std`) augmented with `builtins`.
 
