@@ -23,15 +23,20 @@ in
     strToPath
     cond
     ;
+
+  errors = import ./errors.nix;
+
   lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
-  filterPub = filterMap (
+
+  collectPublic = filterMap (
     k: v:
     let
       s = toLowerCase k;
     in
     if s == k then null else { ${s} = v; }
   );
-  filterMod = builtins.filterSource (
+
+  rmNixSrcs = builtins.filterSource (
     path: type:
     let
       file = parse (baseNameOf path);
@@ -39,7 +44,7 @@ in
     (type == "regular" && file.ext or null != "nix")
     || (type == "directory" && !builtins.pathExists "${path}/mod.nix")
   );
-  errors = import ./errors.nix;
+
   composeStd = path: compose { } path // filterMap stdFilter builtins;
 
   modIsValid =

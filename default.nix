@@ -23,7 +23,7 @@ let
       scope = injectPrevious pre {
         inherit std;
         atom = atom';
-        mod = lowerKeys (l.removeAttrs self [ "mod" ] // { outPath = filterMod dir; });
+        mod = self';
         builtins = errors.builtins;
         import = errors.import;
         scopedImport = errors.import;
@@ -50,6 +50,8 @@ let
           null # Ignore other file types
       ;
 
+      self' = lowerKeys (l.removeAttrs self [ "mod" ] // { outPath = rmNixSrcs dir; });
+
       self =
         let
           mod = Import "${dir + "/mod.nix"}";
@@ -59,7 +61,7 @@ let
 
     in
     if hasMod contents then
-      filterPub self
+      collectPublic self
     else
       # Base case: no module
       { };
