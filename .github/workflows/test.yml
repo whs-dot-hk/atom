@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Structural Integirty Test
-        run: cd test && ./bld.sh
+        run: cd test/integrity && ./bld.sh
   format:
     runs-on: ubuntu-latest
     steps:
@@ -15,3 +15,10 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Code Format Check
         run: eval "$(nix print-dev-env -f shell.nix)" && treefmt --fail-on-change
+  std-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nixbuild/nix-quick-install-action@v28
+      - name: Std Library Config Test
+        run: cd test/std-import && ./import.sh > /dev/null

@@ -1,14 +1,20 @@
 let
-  src = import ./src;
   l = builtins;
+  src = import ./src;
+  pins = import ./npins;
+  toml = l.fromTOML (l.readFile ./compose.toml);
 in
 {
   extern ? { },
+  # internal features of the composer function
+  __features ? toml.features.default or [ ],
 }:
 dir:
 with src;
 let
   std = composeStd ./std;
+
+  __features' = src.features.parse toml.features __features;
 
   f =
     f: pre: dir':
@@ -20,19 +26,50 @@ let
 
       contents = l.readDir dir;
 
-      scope = injectPrevious pre {
-        inherit std;
-        atom = atom';
-        mod = self';
-        builtins = errors.builtins;
-        import = errors.import;
-        scopedImport = errors.import;
-        __fetchurl = errors.fetch;
-        __currentSystem = errors.system;
-        __currentTime = errors.time;
-        __nixPath = errors.nixPath;
-        __storePath = errors.storePath;
+      preOpt = {
+        _if = pre != null;
+        inherit pre;
       };
+
+      scope =
+        let
+          scope' = {
+            atom = atom';
+            mod = self';
+            builtins = errors.builtins;
+            import = errors.import;
+            scopedImport = errors.import;
+            __fetchurl = errors.fetch;
+            __currentSystem = errors.system;
+            __currentTime = errors.time;
+            __nixPath = errors.nixPath;
+            __storePath = errors.storePath;
+          };
+
+          scope'' = injectOptionals scope' [
+            preOpt
+            {
+              _if = l.elem "std" __features';
+              std =
+                std
+                // cond {
+                  _if = l.elem "pkg_lib" __features';
+                  lib = import "${pins."nixpkgs.lib"}/lib";
+                };
+            }
+          ];
+        in
+        scope''
+        // {
+          # information about the internal module system itself
+          __internal = {
+            inherit (toml) project;
+            features = __features';
+            # a copy of the global scope, for testing if values exist
+            # mostly for our internal testing functions
+            scope = scope'';
+          };
+        };
 
       Import = scopedImport scope;
 
@@ -43,7 +80,7 @@ let
           file = parse name;
         in
         if type == "directory" then
-          { ${name} = f (injectPrevious pre (lowerKeys self)) path; }
+          { ${name} = f ((lowerKeys self) // cond preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           { ${file.name} = Import "${path}"; }
         else
