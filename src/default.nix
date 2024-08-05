@@ -55,13 +55,7 @@ in
              ${toString dir}/mod.nix
     '';
 
-  injectPrevious =
-    pre: set:
-    set
-    // cond {
-      _if = pre != null;
-      inherit pre;
-    };
+  injectOptionals = builtins.foldl' (acc: x: acc // cond x);
 
   hasMod = contents: contents."mod.nix" or null == "regular";
 }

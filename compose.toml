@@ -1,0 +1,3 @@
+[std]
+use = true
+nixpkgs_lib = false

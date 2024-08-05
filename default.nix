@@ -1,9 +1,11 @@
 let
   src = import ./src;
   l = builtins;
+  pins = import ./npins;
 in
 {
   extern ? { },
+  config ? builtins.fromTOML (builtins.readFile ./compose.toml),
 }:
 dir:
 with src;
@@ -20,19 +22,37 @@ let
 
       contents = l.readDir dir;
 
-      scope = injectPrevious pre {
-        inherit std;
-        atom = atom';
-        mod = self';
-        builtins = errors.builtins;
-        import = errors.import;
-        scopedImport = errors.import;
-        __fetchurl = errors.fetch;
-        __currentSystem = errors.system;
-        __currentTime = errors.time;
-        __nixPath = errors.nixPath;
-        __storePath = errors.storePath;
+      preOpt = {
+        _if = pre != null;
+        inherit pre;
       };
+
+      scope =
+        injectOptionals
+          {
+            atom = atom';
+            mod = self';
+            builtins = errors.builtins;
+            import = errors.import;
+            scopedImport = errors.import;
+            __fetchurl = errors.fetch;
+            __currentSystem = errors.system;
+            __currentTime = errors.time;
+            __nixPath = errors.nixPath;
+            __storePath = errors.storePath;
+          }
+          [
+            preOpt
+            {
+              _if = config.std.use or false;
+              std =
+                std
+                // cond {
+                  _if = config.std.nixpkgs_lib or false;
+                  lib = import "${pins."nixpkgs.lib"}/lib";
+                };
+            }
+          ];
 
       Import = scopedImport scope;
 
@@ -43,7 +63,7 @@ let
           file = parse name;
         in
         if type == "directory" then
-          { ${name} = f (injectPrevious pre (lowerKeys self)) path; }
+          { ${name} = f ((lowerKeys self) // cond preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           { ${file.name} = Import "${path}"; }
         else
