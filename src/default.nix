@@ -62,4 +62,21 @@ in
 
   features.parse =
     featureSet: l.foldl' (xs: x: if l.elem x xs then xs else [ x ] ++ featureSet.${x} ++ xs) [ ];
+
+  # It is crucial that the directory is a path literal, not a string
+  # since the implicit copy to the /nix/store, which provides isolation,
+  # only happens for path literals.
+  prepDir =
+    dir:
+    let
+      dir' =
+        if l.match "^/nix/store/.+" dir != null then
+          # this is safe because we will never reimport the full path back to the store
+          # only specific files within it, which will have their own context when converted
+          # back to a string.
+          builtins.unsafeDiscardStringContext dir
+        else
+          dir;
+    in
+    if builtins.isPath dir then dir else strToPath dir';
 }

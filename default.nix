@@ -9,21 +9,18 @@ in
   # internal features of the composer function
   __features ? toml.features.default or [ ],
 }:
-dir:
+dir':
 with src;
 let
+  dir = src.prepDir dir';
+
   std = composeStd ./std;
 
   __features' = src.features.parse toml.features __features;
 
   f =
-    f: pre: dir':
+    f: pre: dir:
     let
-      # It is crucial that the directory is a path literal, not a string
-      # since the implicit copy to the /nix/store, which provides isolation,
-      # only happens for path literals.
-      dir = strToPath dir';
-
       contents = l.readDir dir;
 
       preOpt = {
