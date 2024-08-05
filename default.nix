@@ -61,8 +61,12 @@ let
         in
         scope''
         // {
+          # information about the internal module system itself
           __internal = {
+            inherit (toml) project;
             features = __features';
+            # a copy of the global scope, for testing if values exist
+            # mostly for our internal testing functions
             scope = scope'';
           };
         };

@@ -1,3 +1,8 @@
+[project]
+name = "modules"
+version = "0.2.0"
+description = "A purpose built, unopinionated, and performant module system for Nix code."
+
 [features]
 std     = []
 pkg_lib = ["std"]
