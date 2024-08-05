@@ -17,13 +17,14 @@ let
   } ../std/string/toLowerCase.nix;
 in
 {
-  inherit
-    parse
-    fix
-    filterMap
-    strToPath
-    cond
-    ;
+  inherit fix filterMap strToPath;
+
+  file = {
+    inherit parse;
+  };
+  set = {
+    inherit cond;
+  };
 
   errors = import ./errors.nix;
 
