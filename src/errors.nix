@@ -6,4 +6,5 @@
   time = abort "Accessing the current time is impure & illegal.";
   nixPath = abort "The NIX_PATH is an impure feature, and therefore illegal.";
   storePath = abort "Making explicit dependencies on store paths is illegal.";
+  getEnv = abort "Accessing environmental variables is impure & illegal.";
 }

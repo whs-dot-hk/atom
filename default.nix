@@ -42,6 +42,8 @@ let
             __currentTime = errors.time;
             __nixPath = errors.nixPath;
             __storePath = errors.storePath;
+            __getEnv = errors.getEnv;
+            __getFlake = error.import;
           };
 
           scope'' = src.injectOptionals scope' [
