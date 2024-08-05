@@ -47,7 +47,9 @@ in
     || (type == "directory" && !l.pathExists "${path}/mod.nix")
   );
 
-  composeStd = path: compose { } path // filterMap stdFilter builtins;
+  composeStd =
+    path:
+    compose { } path // filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
 
   modIsValid =
     mod: dir:

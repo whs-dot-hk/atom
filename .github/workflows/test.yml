@@ -22,3 +22,10 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Std Library Config Test
         run: cd test/std-import && ./import.sh > /dev/null
+  purity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nixbuild/nix-quick-install-action@v28
+      - name: Purity Integrity Test
+        run: cd test/purity && ./purity.sh

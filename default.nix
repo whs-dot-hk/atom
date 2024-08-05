@@ -43,7 +43,7 @@ let
             __nixPath = errors.nixPath;
             __storePath = errors.storePath;
             __getEnv = errors.getEnv;
-            __getFlake = error.import;
+            __getFlake = errors.import;
           };
 
           scope'' = src.injectOptionals scope' [
