@@ -4,7 +4,7 @@
 # to keep the core impelementation clean
 let
   l = builtins;
-  compose = import ../.;
+  compose = import ../compose.nix;
   fix = import ../std/fix.nix;
   cond = import ../std/set/cond.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;

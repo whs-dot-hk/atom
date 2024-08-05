@@ -1,0 +1,20 @@
+[project]
+name = "dev-tools"
+
+[fetch.pkgs]
+name = "nixpkgs"
+import = true
+args = [{}]
+
+[composer]
+features = ["std"]
+std.features = []
+
+[backends.nix]
+root = "dev"
+# default when `eka` cli is ready
+# fetcher = "native"
+fetcher = "npins"
+
+[fetcher.npins]
+root = "npins"

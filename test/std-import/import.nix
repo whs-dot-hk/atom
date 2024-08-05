@@ -1,5 +1,5 @@
 let
-  compose = set: (import ../../.) (set // { __internal__test = true; }) ./import;
+  compose = set: (import ../../compose.nix) (set // { __internal__test = true; }) ./import;
 in
 {
   default = compose { };
