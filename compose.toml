@@ -1,3 +1,4 @@
-[std]
-use = true
-nixpkgs_lib = false
+[features]
+std     = []
+pkg_lib = ["std"]
+default = ["std"]

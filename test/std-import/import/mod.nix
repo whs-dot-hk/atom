@@ -1,4 +1,8 @@
+let
+  inherit (__internal) scope features;
+in
 {
-  Std = std ? set || abort "std missing";
-  Lib = std ? lib || abort "lib missing";
+  Std = scope ? std;
+  Lib = scope ? std && scope.std ? lib;
+  Core = features;
 }

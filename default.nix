@@ -1,16 +1,20 @@
 let
-  src = import ./src;
   l = builtins;
+  src = import ./src;
   pins = import ./npins;
+  toml = l.fromTOML (l.readFile ./compose.toml);
 in
 {
   extern ? { },
-  config ? builtins.fromTOML (builtins.readFile ./compose.toml),
+  # internal features of the composer function
+  __features ? toml.features.default or [ ],
 }:
 dir:
 with src;
 let
   std = composeStd ./std;
+
+  __features' = src.features.parse toml.features __features;
 
   f =
     f: pre: dir':
@@ -28,8 +32,8 @@ let
       };
 
       scope =
-        injectOptionals
-          {
+        let
+          scope' = {
             atom = atom';
             mod = self';
             builtins = errors.builtins;
@@ -40,19 +44,28 @@ let
             __currentTime = errors.time;
             __nixPath = errors.nixPath;
             __storePath = errors.storePath;
-          }
-          [
+          };
+
+          scope'' = injectOptionals scope' [
             preOpt
             {
-              _if = config.std.use or false;
+              _if = l.elem "std" __features';
               std =
                 std
                 // cond {
-                  _if = config.std.nixpkgs_lib or false;
+                  _if = l.elem "pkg_lib" __features';
                   lib = import "${pins."nixpkgs.lib"}/lib";
                 };
             }
           ];
+        in
+        scope''
+        // {
+          __internal = {
+            features = __features';
+            scope = scope'';
+          };
+        };
 
       Import = scopedImport scope;
 

@@ -3,13 +3,7 @@ let
 in
 {
   default = compose { };
-  noStd = compose { config.std.use = false; };
-  withNixpkgsLib = compose {
-    config.std.nixpkgs_lib = true;
-    config.std.use = true;
-  };
-  noStdNixpkgs = compose {
-    config.std.nixpkgs_lib = true;
-    config.std.use = false;
-  };
+  noStd = compose { __features = [ ]; };
+  explicit = compose { __features = [ "std" ]; };
+  withNixpkgsLib = compose { __features = [ "pkg_lib" ]; };
 }
