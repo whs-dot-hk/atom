@@ -8,6 +8,8 @@ in
   extern ? { },
   # internal features of the composer function
   __features ? toml.features.default or [ ],
+  # enable testing code paths
+  __internal__test ? false,
 }:
 dir':
 let
@@ -56,10 +58,10 @@ let
           ];
         in
         scope''
-        // {
+        // src.set.cond {
+          _if = __internal__test;
           # information about the internal module system itself
           __internal = {
-            inherit (toml) project;
             features = __features';
             # a copy of the global scope, for testing if values exist
             # mostly for our internal testing functions
@@ -106,4 +108,11 @@ let
 
   atom = src.fix f null dir;
 in
+assert
+  !__internal__test
+  || l.warn ''
+    in ${toString ./default.nix}:
+    Internal testing functionality is enabled via the `__test` boolean.
+    This should never be `true` except in internal test runs.
+  '' true;
 atom
