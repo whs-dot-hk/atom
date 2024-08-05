@@ -112,7 +112,8 @@ let
 in
 assert
   !__internal__test
-  || l.warn ''
+  # older versions of Nix don't have the `warn` builtin
+  || l.warn or l.trace ''
     in ${toString ./default.nix}:
     Internal testing functionality is enabled via the `__test` boolean.
     This should never be `true` except in internal test runs.
