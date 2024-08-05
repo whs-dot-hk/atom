@@ -1,5 +1,6 @@
 let
-  dev = import ./. {
+  compose = import ./.;
+  dev = compose {
     extern = rec {
       pins = import ./npins;
       pkgs = import pins.nixpkgs { };
