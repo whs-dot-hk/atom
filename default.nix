@@ -1,23 +1,35 @@
 let
   l = builtins;
   src = import ./src;
-  pins = import ./npins;
-  toml = l.fromTOML (l.readFile ./compose.toml);
 in
 {
   extern ? { },
+  features ? [ ],
   # internal features of the composer function
-  __features ? toml.features.default or [ ],
+  stdFeatures ? src.stdToml.features.default or [ ],
+  composeFeatures ? src.composeToml.features.default,
   # enable testing code paths
   __internal__test ? false,
+  __isStd__ ? false,
 }:
 dir':
 let
   dir = src.prepDir dir';
 
-  std = src.composeStd ./std;
+  std = src.composeStd {
+    features = stdFeatures;
+    inherit __internal__test;
+  } ./std;
 
-  __features' = src.features.parse toml.features __features;
+  composeFeatures' = src.features.parse src.composeToml.features composeFeatures;
+
+  meta = {
+    features = {
+      mod = features;
+      compose = composeFeatures';
+      std = stdFeatures;
+    };
+  };
 
   f =
     f: pre: dir:
@@ -32,7 +44,6 @@ let
       scope =
         let
           scope' = with src; {
-            atom = atom';
             mod = self';
             builtins = errors.builtins;
             import = errors.import;
@@ -46,30 +57,37 @@ let
             __getFlake = errors.import;
           };
 
-          scope'' = src.injectOptionals scope' [
+          scope'' = src.set.inject scope' [
             preOpt
             {
-              _if = l.elem "std" __features';
-              std =
-                std
-                // src.set.cond {
-                  _if = l.elem "pkg_lib" __features';
-                  lib = import "${pins."nixpkgs.lib"}/lib";
-                };
+              _if = !__isStd__ && l.elem "std" composeFeatures';
+              inherit std;
+            }
+            {
+              _if = !__isStd__;
+              atom = atom' // {
+                inherit meta;
+              };
+            }
+            {
+              _if = __isStd__;
+              std = atom // {
+                inherit meta;
+              };
+            }
+            {
+              _if = __internal__test;
+              # information about the internal module system itself
+              # available to tests
+              __internal = {
+                # a copy of the global scope, for testing if values exist
+                # mostly for our internal testing functions
+                scope = scope'';
+              };
             }
           ];
         in
-        scope''
-        // src.set.cond {
-          _if = __internal__test;
-          # information about the internal module system itself
-          __internal = {
-            features = __features';
-            # a copy of the global scope, for testing if values exist
-            # mostly for our internal testing functions
-            scope = scope'';
-          };
-        };
+        scope'';
 
       Import = scopedImport scope;
 
@@ -108,7 +126,11 @@ let
     (baseNameOf dir)
   ];
 
-  atom = src.fix f null dir;
+  atom =
+    let
+      fixed = src.fix f null dir;
+    in
+    src.set.inject fixed [ ({ _if = __isStd__; } // src.pureBuiltins) ];
 in
 assert
   !__internal__test

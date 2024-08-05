@@ -3,7 +3,7 @@ let
 in
 {
   default = compose { };
-  noStd = compose { __features = [ ]; };
-  explicit = compose { __features = [ "std" ]; };
-  withNixpkgsLib = compose { __features = [ "pkg_lib" ]; };
+  noStd = compose { composeFeatures = [ ]; };
+  explicit = compose { stdFeatures = [ ]; };
+  # withNixpkgsLib = compose { stdFeatures = [ "pkg_lib" ]; };
 }

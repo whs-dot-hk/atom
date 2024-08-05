@@ -1,0 +1,8 @@
+[project]
+name = "std"
+version = "0.2.0"
+description = "Nix Standard Library"
+
+[features]
+pkg_lib = []
+default = []

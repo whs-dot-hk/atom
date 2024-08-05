@@ -5,5 +5,4 @@ description = "A purpose built, unopinionated, and performant module system for 
 
 [features]
 std     = []
-pkg_lib = ["std"]
 default = ["std"]

@@ -15,9 +15,18 @@ let
     std = builtins;
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
+  stdToml = l.fromTOML (l.readFile ../std.toml);
+  composeToml = l.fromTOML (l.readFile ../compose.toml);
 in
-{
-  inherit fix filterMap strToPath;
+rec {
+  inherit
+    fix
+    filterMap
+    strToPath
+    stdFilter
+    stdToml
+    composeToml
+    ;
 
   file = {
     inherit parse;
@@ -48,8 +57,12 @@ in
   );
 
   composeStd =
-    path:
-    compose { } path // filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
+    opts: path:
+    compose {
+      inherit (opts) __internal__test;
+      features = features.parse stdToml.features opts.features;
+      __isStd__ = true;
+    } path;
 
   modIsValid =
     mod: dir:
@@ -59,7 +72,9 @@ in
              ${toString dir}/mod.nix
     '';
 
-  injectOptionals = l.foldl' (acc: x: acc // cond x);
+  set.inject = l.foldl' (acc: x: acc // cond x);
+
+  pureBuiltins = filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
 
   hasMod = contents: contents."mod.nix" or null == "regular";
 
