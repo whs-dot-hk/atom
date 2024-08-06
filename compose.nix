@@ -133,7 +133,17 @@ let
       fixed = src.fix f null dir;
     in
     src.set.inject fixed [
-      ({ _if = __isStd__; } // src.pureBuiltins)
+      (
+        {
+          _if = __isStd__;
+        }
+        // src.pureBuiltins
+        // {
+          path = fixed.path // {
+            inherit (src.pureBuiltins) path;
+          };
+        }
+      )
       {
         _if = __isStd__ && l.elem "pkg_lib" __atom.features.parsed.atom;
         inherit (extern) lib;

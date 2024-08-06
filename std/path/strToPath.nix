@@ -1,11 +1,30 @@
+/**
+  Convert a string to a path.
+
+  # Examples
+
+  ```
+  strToPath "/foo/bar" => /foo/bar
+  strToPath "/home/foo" => /home/foo
+  ```
+
+  # Type
+
+  ```
+  strToPath :: String -> Path
+  ```
+
+  # Parameters
+
+  - `str`: The string to convert.
+
+  # Return Value
+
+  A path corresponding to the input string.
+*/
 str:
 let
-  # will fail if the string does not represent an absolute path
-  # which is what we want since this function makes little sense otherwise
   validate = std.toPath str;
-  # recombine the fragment string with an absolute path starting at the root
-  # the result with be a path literal instead of a string
   path = /. + str;
 in
-# avoid the extra work if it is already a path literal
 if std.isPath str then str else std.seq validate path
