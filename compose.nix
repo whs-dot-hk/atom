@@ -100,7 +100,7 @@ let
           file = src.file.parse name;
         in
         if type == "directory" then
-          { ${name} = f ((src.lowerKeys self) // src.set.cond preOpt) path; }
+          { ${name} = f ((src.lowerKeys self) // src.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           { ${file.name} = Import "${path}"; }
         else

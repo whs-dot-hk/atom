@@ -9,6 +9,7 @@
 
   filterMap (key: value: { ${key} = value * 2; }) { foo = 1; bar = 2; }
   => { foo = 2; bar = 4; }
+  ```
 
   # Type
 

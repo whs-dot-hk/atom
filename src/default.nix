@@ -6,7 +6,7 @@ let
   l = builtins;
   fromManifest = import ../.;
   fix = import ../std/fix.nix;
-  cond = import ../std/set/cond.nix;
+  when = scopedImport { std = builtins; } ../std/set/when.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
   strToPath = scopedImport { std = builtins; } ../std/path/strToPath.nix;
   parse = scopedImport { std = builtins; } ../std/file/parse.nix;
@@ -32,7 +32,7 @@ rec {
     inherit parse;
   };
   set = {
-    inherit cond;
+    inherit when;
   };
 
   errors = import ./errors.nix;
@@ -71,7 +71,7 @@ rec {
              ${toString dir}/mod.nix
     '';
 
-  set.inject = l.foldl' (acc: x: acc // cond x);
+  set.inject = l.foldl' (acc: x: acc // when x);
 
   pureBuiltins = filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
 
