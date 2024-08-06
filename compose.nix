@@ -3,6 +3,7 @@ let
   src = import ./src;
 in
 {
+  config,
   extern ? { },
   features ? [ ],
   # internal features of the composer function
@@ -24,11 +25,13 @@ let
   composeFeatures' = src.features.parse src.composeToml.features composeFeatures;
   stdFeatures' = src.features.parse src.stdToml.features stdFeatures;
 
-  meta = {
-    features = {
-      mod = features;
-      compose = composeFeatures';
-      std = stdFeatures';
+  __atom = config // {
+    features = config.features or { } // {
+      parsed = {
+        atom = features;
+        compose = composeFeatures';
+        std = stdFeatures';
+      };
     };
   };
 
@@ -45,6 +48,7 @@ let
       scope =
         let
           scope' = with src; {
+            inherit __atom;
             mod = self';
             builtins = errors.builtins;
             import = errors.import;
@@ -66,13 +70,11 @@ let
             }
             {
               _if = !__isStd__;
-              atom = atom' // {
-                inherit meta;
-              };
+              atom = atom';
             }
             {
               _if = __isStd__;
-              std = l.removeAttrs (extern // atom // { inherit meta; }) [ "std" ];
+              std = l.removeAttrs (extern // atom) [ "std" ];
             }
             {
               _if = __internal__test;
@@ -82,6 +84,7 @@ let
                 # a copy of the global scope, for testing if values exist
                 # mostly for our internal testing functions
                 scope = scope'';
+                inherit src;
               };
             }
           ];
@@ -132,8 +135,8 @@ let
     src.set.inject fixed [
       ({ _if = __isStd__; } // src.pureBuiltins)
       {
-        _if = l.elem "pkg_lib" meta.features.mod;
-        lib = extern.lib;
+        _if = __isStd__ && l.elem "pkg_lib" __atom.features.parsed.atom;
+        inherit (extern) lib;
       }
     ];
 in

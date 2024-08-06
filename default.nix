@@ -5,8 +5,14 @@
 path':
 let
   src = import ./src;
+
   path = src.prepDir path';
-  config = builtins.fromTOML (builtins.readFile path);
+
+  file = builtins.readFile path;
+  config = builtins.fromTOML file;
+  atom = config.atom or { };
+  name = atom.name or (src.errors.missingName path);
+
   features' =
     let
       featSet = config.features or { };
@@ -16,10 +22,9 @@ let
 
   backend = config.backend or { };
   nix = backend.nix or { };
-  lib = config.lib;
   compose = config.compose or { };
 
-  root = lib.path;
+  root = atom.path or name;
   extern =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
@@ -53,22 +58,21 @@ let
   project = config.project or { };
   meta = project.meta or { };
 
+  composeFeatures = compose.features or { };
 in
 (import ./compose.nix) {
-  inherit extern __internal__test;
+  inherit extern __internal__test config;
   features = features';
   composeFeatures =
     let
-      features = compose.features or { };
+      feat = composeFeatures.atom or src.composeToml.features.default;
     in
-    src.features.parse src.composeToml.features features.atom;
+    src.features.parse src.composeToml.features feat;
   stdFeatures =
     let
-      # std = features.std or { };
-      std = features.std or src.stdToml.features.default;
+      feat = composeFeatures.std or src.stdToml.features.default;
     in
-    src.features.parse src.stdToml.features std;
+    src.features.parse src.stdToml.features feat;
 
   __isStd__ = meta.__is_std__ or false;
-
 } (dirOf path + "/${root}")

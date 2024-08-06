@@ -13,7 +13,7 @@ type = "lib"
 # TODO: fetched at buildtime
 # type = "src"
 
-[lib]
+[atom]
 path = "std"
 
 [backend.nix]

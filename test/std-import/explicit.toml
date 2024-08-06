@@ -1,0 +1,7 @@
+[atom]
+name = "test"
+path = "import"
+
+[composer.features]
+atom = ["std"]
+std = []
