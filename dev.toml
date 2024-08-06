@@ -1,8 +1,5 @@
-[project]
-name = "dev-tools"
-
 [atom]
-path = "dev"
+name = "dev"
 
 [fetch.pkgs]
 name = "nixpkgs"

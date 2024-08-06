@@ -55,8 +55,7 @@ let
     else
       { };
 
-  project = config.project or { };
-  meta = project.meta or { };
+  meta = atom.meta or { };
 
   composeFeatures = compose.features or { };
 in

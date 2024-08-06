@@ -82,9 +82,9 @@ let
               # available to tests
               __internal = {
                 # a copy of the global scope, for testing if values exist
-                # mostly for our internal testing functions
+                # for our internal testing functions
                 scope = scope'';
-                inherit src;
+                inherit src __isStd__ __internal__test;
               };
             }
           ];
@@ -147,6 +147,12 @@ let
       {
         _if = __isStd__ && l.elem "pkg_lib" __atom.features.parsed.atom;
         inherit (extern) lib;
+      }
+      {
+        _if = __isStd__ && __internal__test;
+        __internal = {
+          inherit __isStd__;
+        };
       }
     ];
 in
