@@ -32,5 +32,4 @@ f="$(nix eval -f import.nix withNixpkgsLib.std)"
 f="$(nix eval -f import.nix withNixpkgsLib.lib)"
 [[ "$f" == true ]]
 f="$(nix eval -f import.nix withNixpkgsLib.stdF)"
-# FIXME: [[ "$f" == '[ "pkg_lib" "lib" ]' ]] this is the correct answer
-[[ "$f" == '[ "pkg_lib" ]' ]]
+[[ "$f" == '[ "pkg_lib" "lib" ]' ]]

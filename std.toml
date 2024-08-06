@@ -3,21 +3,27 @@ name = "std"
 version = "0.2.0"
 description = "Nix Standard Library"
 
-[fetch.lib]
-name = "nixpkgs.lib"
+[fetch.lib] # the name in `atom` scope
+name = "nixpkgs.lib" # the name in npins
 import = true
-sub = "lib"
+subdir = "lib"
 optional = true
+# TODO: fetched at eval time
+type = "lib"
+# TODO: fetched at buildtime
+# type = "src"
 
-[features]
-pkg_lib = ["lib"]
-default = []
+[lib]
+path = "std"
 
-[backends.nix]
-root = "std"
+[backend.nix]
 fetcher = "npins"
 
 [project.meta]
 # special attribute
 # for the Nix std library
 __is_std__ = true
+
+[features]
+pkg_lib = ["lib"]
+default = []

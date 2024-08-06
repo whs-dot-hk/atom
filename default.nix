@@ -14,11 +14,12 @@ let
     in
     src.features.parse featSet featIn;
 
-  backends = config.backends or { };
-  nix = backends.nix or { };
-  composer = config.composer or { };
+  backend = config.backend or { };
+  nix = backend.nix or { };
+  lib = config.lib;
+  compose = config.compose or { };
 
-  root = nix.root or "nix";
+  root = lib.path;
   extern =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
@@ -33,7 +34,7 @@ let
       src.filterMap (
         k: v:
         let
-          src = "${pins.${v.name or k}}/${v.sub or ""}";
+          src = "${pins.${v.name or k}}/${v.subdir or ""}";
           val =
             if v.import or false then
               if v.args or [ ] != [ ] then builtins.foldl' (f: x: f x) (import src) v.args else import src
@@ -58,15 +59,15 @@ in
   features = features';
   composeFeatures =
     let
-      features = composer.features or src.composeToml.features.default;
+      features = compose.features or {};
     in
-    src.features.parse src.composeToml.features features;
+    src.features.parse src.composeToml.features features.atom;
   stdFeatures =
     let
-      std = composer.std or { };
-      features = std.features or src.stdToml.features.default;
+      # std = features.std or { };
+      std = features.std or src.stdToml.features.default;
     in
-    src.features.parse src.stdToml.features features;
+    src.features.parse src.stdToml.features std;
 
   __isStd__ = meta.__is_std__ or false;
 

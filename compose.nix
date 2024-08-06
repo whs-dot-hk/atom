@@ -22,12 +22,13 @@ let
   } ./std.toml;
 
   composeFeatures' = src.features.parse src.composeToml.features composeFeatures;
+  stdFeatures' = src.features.parse src.stdToml.features stdFeatures;
 
   meta = {
     features = {
       mod = features;
       compose = composeFeatures';
-      std = stdFeatures;
+      std = stdFeatures';
     };
   };
 
