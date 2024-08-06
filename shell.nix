@@ -1,10 +1,4 @@
 let
-  compose = import ./.;
-  dev = compose {
-    extern = rec {
-      pins = import ./npins;
-      pkgs = import pins.nixpkgs { };
-    };
-  } ./dev;
+  dev = (import ./.) { } ./dev.toml;
 in
 dev.shell

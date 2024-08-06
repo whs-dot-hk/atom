@@ -3,6 +3,21 @@ name = "std"
 version = "0.2.0"
 description = "Nix Standard Library"
 
+[fetch.lib]
+name = "nixpkgs.lib"
+import = true
+sub = "lib"
+optional = true
+
 [features]
-pkg_lib = []
+pkg_lib = ["lib"]
 default = []
+
+[backends.nix]
+root = "std"
+fetcher = "npins"
+
+[project.meta]
+# special attribute
+# for the Nix std library
+__is_std__ = true

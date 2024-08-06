@@ -1,9 +1,9 @@
 let
-  compose = set: (import ../../.) (set // { __internal__test = true; }) ./import;
+  compose = set: (import ../../compose.nix) (set // { __internal__test = true; }) ./import;
 in
 {
   default = compose { };
   noStd = compose { composeFeatures = [ ]; };
   explicit = compose { stdFeatures = [ ]; };
-  # withNixpkgsLib = compose { stdFeatures = [ "pkg_lib" ]; };
+  withNixpkgsLib = compose { stdFeatures = [ "pkg_lib" ]; };
 }
