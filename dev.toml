@@ -11,7 +11,7 @@ args = [{}]
 
 [compose.features]
 atom = ["std"]
-std  = ["pkg_lib"]
+std = ["pkg_lib"]
 
 [backend.nix]
 # default when `eka` cli is ready

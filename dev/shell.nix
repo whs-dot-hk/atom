@@ -7,5 +7,7 @@ pkgs.mkShell {
     npins
     nixfmt-rfc-style
     shfmt
+    taplo
+    nodePackages.prettier
   ];
 }
