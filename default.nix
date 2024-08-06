@@ -59,7 +59,7 @@ in
   features = features';
   composeFeatures =
     let
-      features = compose.features or {};
+      features = compose.features or { };
     in
     src.features.parse src.composeToml.features features.atom;
   stdFeatures =
