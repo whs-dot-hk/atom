@@ -14,7 +14,7 @@
   # Type
 
   ```
-  filterMap :: (String -> Any -> Any) -> AttrSet -> AttrSet
+  filterMap :: (Key -> Value -> Any | Null) -> AttrSet -> AttrSet
   ```
 
   # Parameters
