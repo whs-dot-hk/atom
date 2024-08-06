@@ -1,4 +1,4 @@
 let
-  dev = import ./. ./dev.toml;
+  dev = (import ./.) { } ./dev.toml;
 in
 dev.shell

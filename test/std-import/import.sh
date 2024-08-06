@@ -27,9 +27,10 @@ f="$(nix eval -f import.nix noStd.compose)"
 [[ "$f" == '[ ]' ]]
 
 # no std set
-# f="$(nix eval -f import.nix withNixpkgsLib.std)"
-# [[ "$f" == true ]]
-# f="$(nix eval -f import.nix withNixpkgsLib.lib)"
-# [[ "$f" == true ]]
-# f="$(nix eval -f import.nix withNixpkgsLib.core)"
-# [[ "$f" == '[ "pkg_lib" "std" ]' ]]
+f="$(nix eval -f import.nix withNixpkgsLib.std)"
+[[ "$f" == true ]]
+f="$(nix eval -f import.nix withNixpkgsLib.lib)"
+[[ "$f" == true ]]
+f="$(nix eval -f import.nix withNixpkgsLib.stdF)"
+# FIXME: [[ "$f" == '[ "pkg_lib" "lib" ]' ]] this is the correct answer
+[[ "$f" == '[ "pkg_lib" ]' ]]

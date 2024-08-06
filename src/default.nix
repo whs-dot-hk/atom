@@ -4,7 +4,7 @@
 # to keep the core impelementation clean
 let
   l = builtins;
-  compose = import ../compose.nix;
+  fromManifest = import ../.;
   fix = import ../std/fix.nix;
   cond = import ../std/set/cond.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
@@ -56,13 +56,12 @@ rec {
     || (type == "directory" && !l.pathExists "${path}/mod.nix")
   );
 
-  composeStd =
-    opts: path:
-    compose {
-      inherit (opts) __internal__test;
-      features = features.parse stdToml.features opts.features;
-      __isStd__ = true;
-    } path;
+  readStd = opts: fromManifest { inherit (opts) __internal__test features; };
+  # compose {
+  #   inherit (opts) __internal__test;
+  #   features = features.parse stdToml.features opts.features;
+  #   __isStd__ = true;
+  # } path;
 
   modIsValid =
     mod: dir:

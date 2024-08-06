@@ -4,5 +4,4 @@
   Set = mod.set;
   Path = mod.path;
   String = mod.string;
-  Std = std;
 }

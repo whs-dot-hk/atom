@@ -8,7 +8,7 @@ args = [{}]
 
 [composer]
 features = ["std"]
-std.features = []
+std.features = ["pkg_lib"]
 
 [backends.nix]
 root = "dev"

@@ -5,5 +5,5 @@ in
   default = compose { };
   noStd = compose { composeFeatures = [ ]; };
   explicit = compose { stdFeatures = [ ]; };
-  # withNixpkgsLib = compose { stdFeatures = [ "pkg_lib" ]; };
+  withNixpkgsLib = compose { stdFeatures = [ "pkg_lib" ]; };
 }

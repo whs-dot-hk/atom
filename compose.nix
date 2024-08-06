@@ -16,10 +16,10 @@ dir':
 let
   dir = src.prepDir dir';
 
-  std = src.composeStd {
+  std = src.readStd {
     features = stdFeatures;
     inherit __internal__test;
-  } ./std;
+  } ./std.toml;
 
   composeFeatures' = src.features.parse src.composeToml.features composeFeatures;
 
@@ -71,9 +71,7 @@ let
             }
             {
               _if = __isStd__;
-              std = atom // {
-                inherit meta;
-              };
+              std = l.removeAttrs (extern // atom // { inherit meta; }) [ "std" ];
             }
             {
               _if = __internal__test;
@@ -130,7 +128,13 @@ let
     let
       fixed = src.fix f null dir;
     in
-    src.set.inject fixed [ ({ _if = __isStd__; } // src.pureBuiltins) ];
+    src.set.inject fixed [
+      ({ _if = __isStd__; } // src.pureBuiltins)
+      {
+        _if = l.elem "pkg_lib" meta.features.mod;
+        lib = extern.lib;
+      }
+    ];
 in
 assert
   !__internal__test
