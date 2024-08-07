@@ -12,7 +12,7 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 ## Key Features
 
 - **Modular Structure**: Organize Nix code into directories, each defined by a `mod.nix` file.
-- **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
+- **Isolation**: Modules are imported into the Nix store, and manual imports are illegal, enforcing boundaries and preventing relative path access.
 - **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
 - **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and useful.
 - **Scoping**: Each module and member has access to `mod`, `pre`, `atom`, and `std`.
