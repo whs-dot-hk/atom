@@ -145,7 +145,7 @@ let
         }
       )
       {
-        _if = __isStd__ && l.elem "pkg_lib" __atom.features.resolved.atom;
+        _if = __isStd__ && l.elem "lib" __atom.features.resolved.atom;
         inherit (extern) lib;
       }
       {

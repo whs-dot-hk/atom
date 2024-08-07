@@ -5,7 +5,7 @@ sub = "lib"
 optional = true
 
 [features]
-pkg_lib = ["lib"]
+lib = []
 default = []
 
 [backends.nix]
