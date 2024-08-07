@@ -12,7 +12,6 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 ## Key Features
 
 - **Modular Structure**: Organize Nix code into directories, each defined by a `mod.nix` file.
-- **Automatic Importing**: Nix files in a module directory are automatically imported.
 - **Isolation**: Modules are imported into the Nix store, enforcing boundaries and preventing relative path access.
 - **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
 - **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and useful.
@@ -27,17 +26,18 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
    - Other `.nix` files: Automatically imported as module members.
    - Subdirectories with `mod.nix`: Treated as nested modules.
    - Capitalized outputs are public (everything else is private by default)
+   - `mod.outPath` refers to the current module's directory filtered of any nix files or modules, for accessing static files privately
 
 2. **Scoping**:
 
    - `mod`: Current module, includes `outPath` for accessing non-Nix files.
-   - `pre`: Parent module (if applicable) with private members.
+   - `pre`: Parent module (if applicable) with private members; recursive back to the root.
    - `atom`: Top-level module and external dependencies with only public members.
    - `std`: Standard library and `builtins`.
 
 3. **Composition**: Modules are composed recursively, with `mod.nix` contents taking precedence.
 
-4. **Isolation**: Modules are imported into the Nix store, enforcing boundaries.
+4. **Isolation**: Modules are imported into the Nix store as plan files, enforcing boundaries as they cannot access their relative paths directly.
 
 5. **Encapsulation**: implementation details can be cleanly hidden with private module members by default. See: [#5](https://github.com/ekala-project/modules/pull/5) [#6](https://github.com/ekala-project/modules/pull/6)
 
@@ -53,14 +53,16 @@ in
 
 ## Best Practices
 
-- Always use "mod.nix" to define a module in a directory.
+- Always use "mod.nix" to define a module in a directory, and prefer it to specify the modules public interface.
 - Break out large functions or code blocks into their own files
 - Organize related functionality into subdirectories with their own "mod.nix" files.
-- Leverage provided scopes for clean, modular code.
+- Leverage provided scopes for clean, modular and self-contained code.
 - Use `"${mod}/foo.nix"` when needing to access non-Nix files within a module.
 
 ## Future Work
 
-- CLI with static analysis powers (eka)
-- Static manifest format
+- Extensible CLI with static analysis powers, and more (eka)
+- Static manifest format (we now have a draft)
 - tooling integration (LSP, etc)
+- demonstrating the efficient output spec envisioned for efficient evaluation & builds
+- unit testing modules
