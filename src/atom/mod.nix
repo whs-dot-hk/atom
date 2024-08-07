@@ -4,7 +4,7 @@
 # to keep the core impelementation clean
 let
   l = builtins;
-  fromManifest = import ../.;
+  fromManifest = import ./fromManifest.nix;
   fix = import ../std/fix.nix;
   when = scopedImport { std = builtins; } ../std/set/when.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
@@ -16,7 +16,7 @@ let
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
   stdToml = l.fromTOML (l.readFile ../std.toml);
-  composeToml = l.fromTOML (l.readFile ../compose.toml);
+  atomToml = l.fromTOML (l.readFile ../atom.toml);
 in
 rec {
   inherit
@@ -25,7 +25,7 @@ rec {
     strToPath
     stdFilter
     stdToml
-    composeToml
+    atomToml
     ;
 
   file = {
@@ -34,6 +34,8 @@ rec {
   set = {
     inherit when;
   };
+
+  compose = import ./compose.nix;
 
   errors = import ./errors.nix;
 
@@ -57,11 +59,6 @@ rec {
   );
 
   readStd = opts: fromManifest { inherit (opts) __internal__test features; };
-  # compose {
-  #   inherit (opts) __internal__test;
-  #   features = features.parse stdToml.features opts.features;
-  #   __isStd__ = true;
-  # } path;
 
   modIsValid =
     mod: dir:

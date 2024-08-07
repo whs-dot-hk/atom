@@ -1,5 +1,5 @@
 let
-  f = import ../../. { __internal__test = true; };
+  f = import ../../src/atom/fromManifest.nix { __internal__test = true; };
 in
 {
   default = f ./default.toml;

@@ -1,6 +1,6 @@
 let
   l = builtins;
-  src = import ./src;
+  src = import ./mod.nix;
 in
 {
   config,
@@ -8,7 +8,7 @@ in
   features ? [ ],
   # internal features of the composer function
   stdFeatures ? src.stdToml.features.default or [ ],
-  composeFeatures ? src.composeToml.features.default,
+  composeFeatures ? src.atomToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
@@ -20,9 +20,9 @@ let
   std = src.readStd {
     features = stdFeatures;
     inherit __internal__test;
-  } ./std.toml;
+  } ../std.toml;
 
-  composeFeatures' = src.features.parse src.composeToml.features composeFeatures;
+  composeFeatures' = src.features.parse src.atomToml.features composeFeatures;
   stdFeatures' = src.features.parse src.stdToml.features stdFeatures;
 
   __atom = config // {
