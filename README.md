@@ -43,12 +43,19 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 
 ## Usage
 
+> Note: this is an implementation detail, and the true entrypoint should be considered the TOML manifest file.
+> The future cli will honor this and hide this detail from the user.
+
 ```nix
 let
-  compose = import ./path/to/this/module/system;
-  myModule = compose ./path/to/my/atom/root;
+  atom = builtins.fetchGit "https://github.com/ekala-project/atom";
+  fromManifest = import "${atom}/src/atom/fromManifest.nix";
 in
-  myModule
+fromManifest {
+  features = [
+    # optional feature flags
+  ];
+} ./src/dev.toml # or whatever your manifest is called
 ```
 
 ## Best Practices
