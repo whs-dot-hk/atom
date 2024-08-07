@@ -1,3 +1,5 @@
+set -e
+
 should_fail () {
   if "$@"; then
     exit 1

@@ -1,4 +1,4 @@
 let
-  dev = (import ./.) { } ./dev.toml;
+  dev = (import ./src/atom/fromManifest.nix) { } ./src/dev.toml;
 in
 dev.shell

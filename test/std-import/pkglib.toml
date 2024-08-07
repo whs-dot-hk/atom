@@ -1,0 +1,6 @@
+[atom]
+name = "test"
+path = "import"
+
+[compose.features]
+std = ["pkg_lib"]

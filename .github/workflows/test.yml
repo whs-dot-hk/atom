@@ -29,3 +29,10 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Purity Integrity Test
         run: cd test/purity && ./purity.sh
+  pre-semantics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nixbuild/nix-quick-install-action@v28
+      - name: Test `pre` Access & Private Semantics
+        run: cd test && ./pre.sh

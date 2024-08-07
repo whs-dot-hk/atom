@@ -9,6 +9,8 @@ f="$(nix eval -f import.nix default.lib)"
 [[ "$f" == false ]]
 f="$(nix eval -f import.nix default.compose)"
 [[ "$f" == '[ "std" ]' ]]
+f="$(nix eval -f import.nix default.sanity)"
+[[ "$f" == true ]]
 
 # explicit
 f="$(nix eval -f import.nix explicit.std)"

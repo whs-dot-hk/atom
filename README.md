@@ -1,6 +1,6 @@
 > ⚠️ Warning: WIP Alpha ⚠️
 >
-> This is meant to deprecate current NixOS module mechanism as *legacy* when it's ready, but we are not quite there yet.
+> This is meant to deprecate current NixOS module mechanism as _legacy_ when it's ready, but we are not quite there yet.
 
 # Nix Module System
 
@@ -22,12 +22,14 @@ code without having to perform a full evaluation. This could be used, e.g. to sh
 ## How It Works
 
 1. **Module Structure**:
+
    - `mod.nix`: Defines a module. Its presence is required for the directory to be treated as a module.
    - Other `.nix` files: Automatically imported as module members.
    - Subdirectories with `mod.nix`: Treated as nested modules.
    - Capitalized outputs are public (everything else is private by default)
 
 2. **Scoping**:
+
    - `mod`: Current module, includes `outPath` for accessing non-Nix files.
    - `pre`: Parent module (if applicable) with private members.
    - `atom`: Top-level module and external dependencies with only public members.
@@ -51,14 +53,14 @@ in
 
 ## Best Practices
 
-* Always use "mod.nix" to define a module in a directory.
-* Break out large functions or code blocks into their own files
-* Organize related functionality into subdirectories with their own "mod.nix" files.
-* Leverage provided scopes for clean, modular code.
-* Use `"${mod}/foo.nix"` when needing to access non-Nix files within a module.
+- Always use "mod.nix" to define a module in a directory.
+- Break out large functions or code blocks into their own files
+- Organize related functionality into subdirectories with their own "mod.nix" files.
+- Leverage provided scopes for clean, modular code.
+- Use `"${mod}/foo.nix"` when needing to access non-Nix files within a module.
 
 ## Future Work
 
-* CLI with static analysis powers (eka)
-* Static manifest format
-* tooling integration (LSP, etc)
+- CLI with static analysis powers (eka)
+- Static manifest format
+- tooling integration (LSP, etc)
