@@ -66,3 +66,4 @@ in
 - tooling integration (LSP, etc)
 - demonstrating the efficient output spec envisioned for efficient evaluation & builds
 - unit testing modules
+- how to and extensive docs of core features
