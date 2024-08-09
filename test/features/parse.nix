@@ -3,4 +3,5 @@ let
 in
 {
   recursive-features = f ./recursive-features.toml;
+  recursive-features-loop = f ./recursive-features-loop.toml;
 }
