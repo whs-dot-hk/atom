@@ -8,7 +8,7 @@ let
   fix = import ../std/fix.nix;
   when = scopedImport { std = builtins; } ../std/set/when.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
-  strToPath = scopedImport { std = builtins; } ../std/path/strToPath.nix;
+  make = scopedImport { std = builtins; } ../std/path/make.nix;
   parse = scopedImport { std = builtins; } ../std/file/parse.nix;
   stdFilter = import ./stdFilter.nix;
   toLowerCase = scopedImport rec {
@@ -22,11 +22,14 @@ rec {
   inherit
     fix
     filterMap
-    strToPath
     stdFilter
     stdToml
     coreToml
     ;
+
+  path = {
+    inherit make;
+  };
 
   file = {
     inherit parse;
@@ -51,14 +54,22 @@ rec {
     if s == k then null else { ${s} = v; }
   );
 
-  rmNixSrcs = l.filterSource (
-    path: type:
+  rmNixSrcs =
+    path:
     let
-      file = parse (baseNameOf path);
+      name = baseNameOf path;
     in
-    (type == "regular" && file.ext or null != "nix")
-    || (type == "directory" && !l.pathExists "${path}/mod.nix")
-  );
+    l.path {
+      inherit name path;
+      filter = (
+        path: type:
+        let
+          file = parse path;
+        in
+        (type == "regular" && file.ext or null != "nix")
+        || (type == "directory" && !l.pathExists "${path}/mod.nix")
+      );
+    };
 
   readStd = opts: fromManifest { inherit (opts) __internal__test features; };
 
@@ -91,5 +102,5 @@ rec {
         else
           dir;
     in
-    if builtins.isPath dir then dir else strToPath dir';
+    if builtins.isPath dir then dir else make /. dir';
 }

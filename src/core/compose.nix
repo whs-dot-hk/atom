@@ -154,7 +154,7 @@ let
           path = dir + "/${name}";
           file = src.file.parse name;
         in
-        if type == "directory" then
+        if type == "directory" && l.pathExists "${toString path}/mod.nix" then
           { ${name} = f ((src.lowerKeys self) // src.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           { ${file.name} = Import "${path}"; }
@@ -195,7 +195,7 @@ let
         // src.pureBuiltins
         // {
           path = fixed.path // {
-            inherit (src.pureBuiltins) path;
+            __functor = _: l.path;
           };
         }
       )
