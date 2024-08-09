@@ -34,4 +34,4 @@ f="$(nix eval -f import.nix withNixpkgsLib.std)"
 f="$(nix eval -f import.nix withNixpkgsLib.lib)"
 [[ "$f" == true ]]
 f="$(nix eval -f import.nix withNixpkgsLib.stdF)"
-[[ "$f" == '[ "pkg_lib" "lib" ]' ]]
+[[ "$f" == '[ "lib" "pkg_lib" ]' ]]

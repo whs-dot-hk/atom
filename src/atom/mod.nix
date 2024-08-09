@@ -75,7 +75,21 @@ rec {
   hasMod = contents: contents."mod.nix" or null == "regular";
 
   features.parse =
-    featureSet: l.foldl' (xs: x: if l.elem x xs then xs else [ x ] ++ featureSet.${x} ++ xs) [ ];
+    featureSet:
+    let
+      fold = l.foldl' (
+        acc: x:
+        acc ++ l.filter (y: !l.elem y acc) featureSet.${x} or [ ] ++ (if l.elem x acc then [ ] else [ x ])
+      ) [ ];
+      fixed =
+        xs:
+        let
+          xs' = l.sort l.lessThan xs;
+          next = l.sort l.lessThan (fold xs');
+        in
+        if next == xs' then xs' else fixed next;
+    in
+    fixed;
 
   # It is crucial that the directory is a path literal, not a string
   # since the implicit copy to the /nix/store, which provides isolation,
