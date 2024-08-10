@@ -72,20 +72,18 @@ in
 
     :::
   */
-  parse =
-    featureSet:
+  resolve =
+    featureSet: initials:
     let
-      fold = l.foldl' (
-        acc: x:
-        acc ++ l.filter (y: !l.elem y acc) featureSet.${x} or [ ] ++ (if l.elem x acc then [ ] else [ x ])
-      ) [ ];
-      fixed =
-        xs:
+      resolve =
+        features: acc:
         let
-          xs' = l.sort l.lessThan xs;
-          next = l.sort l.lessThan (fold xs');
+          features' = l.filter (f: !(acc ? ${f})) features;
+          acc' = l.foldl' (a: f: a // { ${f} = null; }) acc features';
         in
-        if next == xs' then xs' else fixed next;
+        if features' == [ ] then acc' else resolve (l.concatMap (f: featureSet.${f} or [ ]) features') acc';
+
+      resolved = resolve initials { };
     in
-    fixed;
+    l.attrNames resolved;
 }

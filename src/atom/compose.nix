@@ -22,12 +22,12 @@ let
     inherit __internal__test;
   } ../std.toml;
 
-  composeFeatures' = src.features.parse src.atomToml.features composeFeatures;
-  stdFeatures' = src.features.parse src.stdToml.features stdFeatures;
+  composeFeatures' = src.features.resolve src.atomToml.features composeFeatures;
+  stdFeatures' = src.features.resolve src.stdToml.features stdFeatures;
 
   __atom = config // {
     features = config.features or { } // {
-      parsed = {
+      resolved = {
         atom = features;
         compose = composeFeatures';
         std = stdFeatures';
@@ -145,7 +145,7 @@ let
         }
       )
       {
-        _if = __isStd__ && l.elem "pkg_lib" __atom.features.parsed.atom;
+        _if = __isStd__ && l.elem "pkg_lib" __atom.features.resolved.atom;
         inherit (extern) lib;
       }
       {
