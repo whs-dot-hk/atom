@@ -80,6 +80,8 @@ in
 
 ## TOML Manifest (Unstable)
 
+> ⚠️ The manifest's structure _will_ change as the project develops.
+
 Each atom is defined by a TOML manifest file, enhancing dependency tracking and separation of concerns:
 
 ```toml
@@ -97,9 +99,7 @@ import = true
 args = [{}]
 ```
 
-### Components:
-
-> ⚠️ The manifest's structure _will_ change as the project develops.
+### Demonstrated Components:
 
 - Atom metadata
 - Feature flags
