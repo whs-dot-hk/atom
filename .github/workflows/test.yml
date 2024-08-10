@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Feature Parsing Test
-        run: cd test/features && ./parse.sh > /dev/null
+        run: cd test/features && ./resolve.sh > /dev/null
   purity:
     runs-on: ubuntu-latest
     steps:

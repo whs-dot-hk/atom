@@ -1,6 +1,6 @@
 [atom]
 name = "features"
-path = "parse"
+path = "resolve"
 
 [features]
 a = ["b"]
