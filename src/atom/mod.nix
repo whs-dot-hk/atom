@@ -39,6 +39,8 @@ rec {
 
   errors = import ./errors.nix;
 
+  features = import ./features.nix;
+
   lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
 
   collectPublic = filterMap (
@@ -73,9 +75,6 @@ rec {
   pureBuiltins = filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
 
   hasMod = contents: contents."mod.nix" or null == "regular";
-
-  features.parse =
-    featureSet: l.foldl' (xs: x: if l.elem x xs then xs else [ x ] ++ featureSet.${x} ++ xs) [ ];
 
   # It is crucial that the directory is a path literal, not a string
   # since the implicit copy to the /nix/store, which provides isolation,

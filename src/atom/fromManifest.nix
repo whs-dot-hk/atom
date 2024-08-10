@@ -18,7 +18,7 @@ let
       featSet = config.features or { };
       featIn = if features == null then featSet.default or [ ] else features;
     in
-    mod.features.parse featSet featIn;
+    mod.features.resolve featSet featIn;
 
   backend = config.backend or { };
   nix = backend.nix or { };
@@ -66,12 +66,12 @@ in
     let
       feat = composeFeatures.atom or mod.atomToml.features.default;
     in
-    mod.features.parse mod.atomToml.features feat;
+    mod.features.resolve mod.atomToml.features feat;
   stdFeatures =
     let
       feat = composeFeatures.std or mod.stdToml.features.default;
     in
-    mod.features.parse mod.stdToml.features feat;
+    mod.features.resolve mod.stdToml.features feat;
 
   __isStd__ = meta.__is_std__ or false;
 } (dirOf path + "/${root}")

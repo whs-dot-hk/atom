@@ -1,0 +1,8 @@
+[atom]
+name = "features"
+path = "resolve"
+
+[features]
+a = ["b", "c"]
+c = ["b"]
+default = ["a"]
