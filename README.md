@@ -1,50 +1,120 @@
+# Nix Module System (Atom)
+
 > ⚠️ Warning: WIP Alpha ⚠️
 >
-> This is meant to deprecate current NixOS module mechanism as _legacy_ when it's ready, but we are not quite there yet.
+> Aiming to deprecate or reform the NixOS module mechanism.
 
-# Nix Module System
+A lean, efficient module system for Nix that prioritizes simplicity and efficiency.
 
-A flexible and efficient module system for Nix, providing structured organization and composition of Nix code with strong isolation. By composing modules into discreet units referred to as "atoms" (akin to cargo crates, etc.), one can avoid the excessive cost of Nix boilerplate and focus on actual code, without sacrificing performance or flexibility.
+## Module Structure
 
-Crucially, the system is designed to aid static analysis, so one can determine useful properties about your Nix
-code without having to perform a full evaluation. This could be used, e.g. to ship off Nix files for evaluation on a more powerful remote machine, or for having a complete view of your code (including auto-complete) in your LSP.
+A module in Atom is defined as a directory containing a `mod.nix` file. This structure allows for:
 
-## Key Features
+- **Modular Organization**: Each directory with a `mod.nix` file is treated as a distinct module.
+- **Auto-importing**: All `.nix` files in the module directory are automatically imported as module members.
+- **Nested Modules**: Subdirectories containing `mod.nix` files are treated as nested modules.
+- **Public/Private Distinction**: Capitalized names in `mod.nix` denote public exports; all others are private by default.
+- **Static File Access**: `mod.outPath` for non-Nix files, excluding submodules.
 
-- **Modular Structure**: Organize Nix code into directories, each defined by a `mod.nix` file.
-- **Isolation**: Modules are imported into the Nix store, and manual imports are illegal, enforcing boundaries and preventing relative path access.
-- **Introspection**: Unlike legacy modules, code is specified in its final form instead of as prototypes (functions), leading to much better and simpler introspective analysis.
-- **Simplicity**: The system is kept purposefully simple and flexible in order to remain performant and useful.
-- **Scoping**: Each module and member has access to `mod`, `pre`, `atom`, and `std`.
-- **Standard Library**: Includes a standard library (`std`) augmented with `builtins`.
+This approach enables clean separation of concerns, easy refactoring, and controlled access to module contents, while maintaining the ability to include necessary static files within each module's scope.
 
-## How It Works
+## Scoping Examples
 
-1. **Module Structure**:
+### `mod`: Current Module
 
-   - `mod.nix`: Defines a module. Its presence is required for the directory to be treated as a module.
-   - Other `.nix` files: Automatically imported as module members.
-   - Subdirectories with `mod.nix`: Treated as nested modules.
-   - Capitalized outputs are public (everything else is private by default)
-   - `mod.outPath` refers to the current module's directory filtered of any nix files or modules, for accessing static files privately
+```nix
+# string/mod.nix
+{
+  ToLower = mod.toLowerCase;
+  Like = mod.like;
+}
 
-2. **Scoping**:
+# string/toLowerCase.nix
+str:
+let
+  head = std.substring 0 1 str;
+  tail = std.substring 1 (-1) str;
+in
+"${mod.ToLower head}${tail}"
+```
 
-   - `mod`: Current module, includes `outPath` for accessing non-Nix files.
-   - `pre`: Parent module (if applicable) with private members; recursive back to the root.
-   - `atom`: Top-level module and external dependencies with only public members.
-   - `std`: Standard library and `builtins`.
+### `pre`: Parent Module Chain
 
-3. **Composition**: Modules are composed recursively, with `mod.nix` contents taking precedence.
+```nix
+# parent/mod.nix
+{
+  privateHelper = x: x * 2;
+  PublicFunc = x: x + 1;
+}
 
-4. **Isolation**: Modules are imported into the Nix store as plan files, enforcing boundaries as they cannot access their relative paths directly.
+# parent/child/mod.nix
+{
+  UseParentPrivate = x: pre.privateHelper x;
+  UseParentPublic = x: pre.PublicFunc x;
+}
+```
 
-5. **Encapsulation**: implementation details can be cleanly hidden with private module members by default. See: [#5](https://github.com/ekala-project/modules/pull/5) [#6](https://github.com/ekala-project/modules/pull/6)
+### `atom`: Top-level and Dependencies
+
+```nix
+# root/mod.nix
+{
+  RootFunc = x: x * 3;
+}
+
+# nested/deep/mod.nix
+{
+  UseRoot = x: atom.RootFunc x;
+}
+```
+
+### `std`: Standard Library
+
+```nix
+# utils/mod.nix
+{
+  Double = x: std.mul 2 x;
+  IsEven = x: std.mod x 2 == 0;
+}
+```
+
+## TOML Manifest (Unstable)
+
+Each atom is defined by a TOML manifest file, enhancing dependency tracking and separation of concerns:
+
+```toml
+[atom]
+name = "dev"
+version = "0.1.0"
+description = "Development environment"
+
+[features]
+default = []
+
+[fetch.pkgs]
+name = "nixpkgs"
+import = true
+args = [{}]
+```
+
+### Components:
+
+> ⚠️ The manifest's structure _will_ change as the project develops.
+
+- Atom metadata
+- Feature flags
+- Legacy Nix expression fetching (e.g., nixpkgs)
+
+Atoms are built on a theoretical language-agnostic, plugin-based schema extension mechanism. Here, `[atom]` and `[features]` are core components, while `[fetch]` represents a Nix-specific plugin feature.
+
+Exact dependency and composition semantics are still evolving. For updates, see:
+
+- [Compositional Semantics #19](https://github.com/ekala-project/atom/issues/19)
+- [Manifest Stabilization #31](https://github.com/ekala-project/atom/issues/31)
 
 ## Usage
 
-> Note: this is an implementation detail, and the true entrypoint should be considered the TOML manifest file.
-> The future cli will honor this and hide this detail from the user.
+> ⚠️ Implementation detail: The TOML Manifest is the true entrypoint. Future CLI will respect this.
 
 ```nix
 let
@@ -55,22 +125,23 @@ fromManifest {
   features = [
     # optional feature flags
   ];
-} ./src/dev.toml # or whatever your manifest is called
+} ./src/dev.toml # or specific manifest file
 ```
 
-## Best Practices
+## Future CLI: `eka`
 
-- Always use "mod.nix" to define a module in a directory, and prefer it to specify the modules public interface.
-- Break out large functions or code blocks into their own files
-- Organize related functionality into subdirectories with their own "mod.nix" files.
-- Leverage provided scopes for clean, modular and self-contained code.
-- Use `"${mod}/foo.nix"` when needing to access non-Nix files within a module.
+Atom is designed with a future CLI tool, tentatively named 'eka', in mind. This CLI will:
 
-## Future Work
+- Respect the TOML manifest as the true entrypoint
+- Provide advanced static analysis capabilities
+- Enable efficient evaluation and build processes
+- Support multiple backends, with Nix being one of them
+- Capitalize on the self-contained structure of Atoms.
 
-- Extensible CLI with static analysis powers, and more (eka)
-- Static manifest format (we now have a draft)
-- tooling integration (LSP, etc)
-- demonstrating the efficient output spec envisioned for efficient evaluation & builds
-- unit testing modules
-- how to and extensive docs of core features
+For more details and ongoing discussions, see:
+
+- [Efficient Build Pipelines: #20](https://github.com/ekala-project/atom/issues/20)
+- [Fetching with JOSH: #25](https://github.com/ekala-project/atom/issues/25)
+- [Isolated Evaluation: #27](https://github.com/ekala-project/atom/issues/27)
+
+The research & development of 'eka' is part of our broader vision to create a more integrated, efficient, secure, and flexible development environment.
