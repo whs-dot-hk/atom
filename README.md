@@ -132,7 +132,8 @@ fromManifest {
 
 Atom is designed with a future CLI tool, tentatively named 'eka', in mind. This CLI will:
 
-- Respect the TOML manifest as the true entrypoint
+- Respect the TOML manifest
+- Allow schema extension via a language-agnostic plugin interface
 - Provide advanced static analysis capabilities
 - Enable efficient evaluation and build processes
 - Support multiple backends, with Nix being one of them
