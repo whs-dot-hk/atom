@@ -3,74 +3,50 @@ let
 in
 {
   /**
-    `parse featureSet features` processes a set of features and resolves dependencies to return a sorted, deduplicated list of all required features.
+    Resolve feature dependencies for Atom's module composer.
 
-    This function is useful for managing feature sets with dependencies, ensuring that each feature and its dependencies are included in a consistent order.
+    This function takes a set of features and their dependencies, and an initial list of features.
+    It returns a list of all required features, including dependencies, without duplicates.
 
-    **Relation to Dependency Resolution**
+    # Examples
 
-    This section explains `parse` by demonstrating how it resolves dependencies and ensures a stable order of features.
+    Given a TOML file with feature declarations:
 
-    For context, when dealing with feature sets in Nix, you might have features that depend on other features. The `parse` function helps in resolving these dependencies and provides a final list where each feature appears only once and is ordered such that dependencies are satisfied.
-
-    ```nix
-    let
-      featureSet = {
-        featureA = [ "featureB" ];
-        featureB = [ "featureC" ];
-        featureC = [ ];
-      };
-    in
-    parse featureSet [ "featureA" ]
+    ```toml
+    [features]
+    default = ["foo", "bar"]
+    foo = ["baz"]
+    bar = ["qux"]
+    baz = []
+    qux = ["baz"]
     ```
 
-    This example will return a list: `[ "featureC", "featureB", "featureA" ]`, ensuring that each feature's dependencies are resolved and ordered correctly.
+    Nix usage:
 
-    The function uses a recursive approach to achieve this, similar to how fixed-point computations work, by repeatedly sorting and deduplicating until no further changes occur.
-
-    # Inputs
-
-    `featureSet`
-
-    : 1\. Attribute set where each attribute represents a feature and maps to a list of its dependencies.
-
-    `features`
-
-    : 2\. List with selected features.
+    ```nix
+    features.resolve featureSet ["foo", "bar"] => ["foo", "baz", "bar", "qux"]
+    ```
 
     # Type
 
     ```
-    parse :: { a: [a] } -> [a]
+    features.resolve :: AttrSet -> [String] -> [String]
     ```
 
-    # Examples
-    :::{.example}
-    ## `parse` usage example
+    # Parameters
 
-    ```nix
-    let
-      featureSet = {
-        featureA = [ "featureB" ];
-        featureB = [ "featureC" ];
-        featureC = [ ];
-      };
-    in
-    parse featureSet [ "featureA" ]
-    => [ "featureC", "featureB", "featureA" ]
+    - `featureSet`: An attribute set where keys are feature names and values are lists of dependencies.
+    - `initials`: A list of initially requested features.
 
-    let
-      featureSet = {
-        featureX = [ "featureY", "featureZ" ];
-        featureY = [ ];
-        featureZ = [ "featureY" ];
-      };
-    in
-    parse featureSet [ "featureX" ]
-    => [ "featureY", "featureZ", "featureX" ]
-    ```
+    # Return Value
 
-    :::
+    A list of strings representing all required features, including dependencies, without duplicates.
+
+    # Notes
+
+    - The function handles circular dependencies.
+    - The order of features in the output list is not guaranteed.
+    - Features not present in the `featureSet` are ignored.
   */
   resolve =
     featureSet: initials:
