@@ -1,3 +1,28 @@
+/**
+  # `fromManifest`
+
+  > Warning: This file is a temporary, hardcoded, solution to enable Atom's functionality.
+
+  While Nix can parse JSON, generating this information outside of a Nix environment would be ideal.
+  `fromManifest` is a demonstration feature, allowing users to experience Atom's capabilities now.
+
+  Atom aims to be a valuable, unopinionated component for Nix developers, ensuring a bounded code
+  collection phase. Its true entry point is the `compose` function, which is why it's maintained
+  separately.
+
+  We envision a language-agnostic space for expressing code typically found in IFD evaluations.
+  This approach could eliminate the need for IFD by providing a uniform, versioned way to write
+  logic that interfaces with a versioned API (`compose` inputs).
+
+  The current proliferation of platform-specific derivations (e.g., `packages.(x86_|aarch)64-linux`)
+  doesn't fully leverage Nix's purity. These should be generated inputs, validated against an API
+  that rejects invalid entries early.
+
+  This environment would address the drawbacks of current Nix IFD, offering a superior alternative
+  to the status quo (2nix). It would avoid committing large portions of generated code or incurring
+  the high cost of IFD evaluations. Instead, we could handle this part independently of Nix,
+  creating a flat module space that allows for reasonable assumptions about our code.
+*/
 {
   features ? null,
   __internal__test ? false,

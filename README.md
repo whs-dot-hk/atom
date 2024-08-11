@@ -8,15 +8,14 @@ A lean, efficient module system for Nix that prioritizes simplicity and efficien
 
 ## Module Structure
 
-A module in Atom is defined as a directory containing a `mod.nix` file. This structure allows for:
+Modules in Atom are defined as directories with a `mod.nix` file containing an attribute set define distinct modules. Subdirectories with `mod.nix` create nested modules. Features include:
 
-- **Modular Organization**: Each directory with a `mod.nix` file is treated as a distinct module.
-- **Auto-importing**: All `.nix` files in the module directory are automatically imported as module members.
-- **Nested Modules**: Subdirectories containing `mod.nix` files are treated as nested modules.
-- **Public/Private Distinction**: Capitalized names in `mod.nix` denote public exports; all others are private by default.
-- **Static File Access**: `mod.outPath` for non-Nix files, excluding submodules.
+- **Explicit Scope**: All `.nix` files in the module directory are implicitly imported as module members with their associated scope. Manual `import` is prohibited, ensuring a consistent global namespace.
+- **Direct Type Declaration**: Enables declaring code as its intended type without function wrappers. Enhances Nix's introspection capabilities, allowing complete Atom exploration in REPLs, while laying groundwork for future static analysis tooling.
+- **Public/Private Distinction**: Capitalized members denote public exports; all others are private by default.
+- **Static File Access**: `mod.outPath` provides access to non-Nix files, excluding submodules, offering an efficient file system API with a well-defined scope.
 
-This approach enables clean separation of concerns, easy refactoring, and controlled access to module contents, while maintaining the ability to include necessary static files within each module's scope.
+These features collectively provide a structured, introspectable, and efficient module system that enhances code organization and maintainability in Nix projects.
 
 ## Scoping Examples
 
@@ -105,16 +104,16 @@ args = [{}]
 - Feature flags
 - Legacy Nix expression fetching (e.g., nixpkgs)
 
-Atoms are built on a theoretical language-agnostic, plugin-based schema extension mechanism. Here, `[atom]` and `[features]` are core components, while `[fetch]` represents a Nix-specific plugin feature.
+Atoms are designed to accommodate a future plugin-based schema extension system, envisioned for the theoretical CLI: [`eka`](#future-cli-eka). In this proposed framework, `[atom]` and `[features]` would serve as foundational elements, while `[fetch]` illustrates a potential Nix-specific plugin feature.
 
-Exact dependency and composition semantics are still evolving. For updates, see:
+Exact dependency and composition semantics are still evolving. For updates relating to the high-level format, see:
 
 - [Compositional Semantics #19](https://github.com/ekala-project/atom/issues/19)
 - [Manifest Stabilization #31](https://github.com/ekala-project/atom/issues/31)
 
 ## Usage
 
-> ⚠️ Implementation detail: The TOML Manifest is the true entrypoint. Future CLI will respect this.
+> ⚠️ [Implementation detail](./src/atom/fromManifest.nix): The TOML Manifest is the true entrypoint. Future CLI will respect this.
 
 ```nix
 let
