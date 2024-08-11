@@ -11,7 +11,7 @@ A lean, efficient module system for Nix that prioritizes simplicity and efficien
 Modules in Atom are directories with a `mod.nix` file containing an attribute set, with subdirectories of the same structure forming submodules. Features include:
 
 - **Explicit Scope**: All other `.nix` files in the module directory are implicitly imported as module members with their associated scope. Manual `import` is prohibited, ensuring a consistent global namespace.
-- **Predictable Composition**: O(n) for shallow, O(n \* log(m)) for deep nesting.
+- **Predictable Composition**: *O(n)* for shallow, *O(n \* log(m))* for deep nesting.
 - **Direct Type Declaration**: Enables declaring code as its intended type without function wrappers. Enhances Nix's introspection capabilities, allowing complete Atom exploration in REPLs, while laying groundwork for future static analysis tooling.
 - **Public/Private Distinction**: Capitalized members denote public exports; all others are private by default.
 - **Static File Access**: `mod.outPath` provides access to non-Nix files, excluding submodules, offering an efficient file system API with a well-defined scope.
