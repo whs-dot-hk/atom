@@ -1,27 +1,19 @@
 /**
   # `fromManifest`
 
-  > Warning: This file is a temporary, hardcoded, solution to enable Atom's functionality.
+  > #### ⚠️ Warning ⚠️
+  >
+  > `fromManifests` current implementation should be reduced close to:
+  > ```nix
+  >   compose <| std.fromJSON
+  > ```
 
-  While Nix can parse JSON, generating this information outside of a Nix environment would be ideal.
-  `fromManifest` is a demonstration feature, allowing users to experience Atom's capabilities now.
+  In other words, compose should receive a dynamically generated json from the CLI.
 
-  Atom aims to be a valuable, unopinionated component for Nix developers, ensuring a bounded code
-  collection phase. Its true entry point is the `compose` function, which is why it's maintained
-  separately.
-
-  We envision a language-agnostic space for expressing code typically found in IFD evaluations.
-  This approach could eliminate the need for IFD by providing a uniform, versioned way to write
-  logic that interfaces with a versioned API (`compose` inputs).
-
-  The current proliferation of platform-specific derivations (e.g., `packages.(x86_|aarch)64-linux`)
-  doesn't fully leverage Nix's purity. These should be generated inputs, validated against an API
-  that rejects invalid entries early.
-
-  This environment would address the drawbacks of current Nix IFD, offering a superior alternative
-  to the status quo (2nix). It would avoid committing large portions of generated code or incurring
-  the high cost of IFD evaluations. Instead, we could handle this part independently of Nix,
-  creating a flat module space that allows for reasonable assumptions about our code.
+  If nix-lang gets some sort of native (and performant!) schema validation such as:
+  [nixos/nix#5403](https://github.com/NixOS/nix/pull/5403) in the future, we can look at
+  revalidating on the Nix side as an extra precaution, but initially, we just assume we have a
+  valid input (and the CLI should type check on it's end)
 */
 {
   features ? null,
