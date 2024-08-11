@@ -8,7 +8,7 @@ A lean, efficient module system for Nix that prioritizes simplicity and efficien
 
 ## Module Structure
 
-Modules in Atom are defined as directories with a `mod.nix` file containing an attribute set define distinct modules. Subdirectories with `mod.nix` create nested modules. Features include:
+Modules in Atom are directories with a `mod.nix` file containing an attribute set, with subdirectories of the same structure forming submodules. Features include:
 
 - **Explicit Scope**: All `.nix` files in the module directory are implicitly imported as module members with their associated scope. Manual `import` is prohibited, ensuring a consistent global namespace.
 - **Direct Type Declaration**: Enables declaring code as its intended type without function wrappers. Enhances Nix's introspection capabilities, allowing complete Atom exploration in REPLs, while laying groundwork for future static analysis tooling.
