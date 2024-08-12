@@ -29,9 +29,9 @@ f="$(nix eval -f import.nix noStd.lib)"
 [[ "$f" == false ]]
 
 # no std set
-f="$(nix eval -f import.nix withNixpkgsLib.stdF)"
-[[ "$f" == '[ "lib" "pkg_lib" ]' ]]
-f="$(nix eval -f import.nix withNixpkgsLib.std)"
+f="$(nix eval -f import.nix withLib.stdF)"
+[[ "$f" == '[ "lib" ]' ]]
+f="$(nix eval -f import.nix withLib.std)"
 [[ "$f" == true ]]
-f="$(nix eval -f import.nix withNixpkgsLib.lib)"
+f="$(nix eval -f import.nix withLib.lib)"
 [[ "$f" == true ]]

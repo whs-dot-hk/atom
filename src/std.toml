@@ -22,5 +22,5 @@ fetcher = "npins"
 __is_std__ = true
 
 [features]
-pkg_lib = ["lib"]
+lib = []
 default = []
