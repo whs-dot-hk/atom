@@ -61,7 +61,16 @@ let
           src = "${pins.${v.name or k}}/${v.subdir or ""}";
           val =
             if v.import or false then
-              if v.args or [ ] != [ ] then builtins.foldl' (f: x: f x) (import src) v.args else import src
+              if v.args or [ ] != [ ] then
+                builtins.foldl' (
+                  f: x:
+                  let
+                    intersect = x // (builtins.intersectAttrs x extern);
+                  in
+                  if builtins.isAttrs x then f intersect else f x
+                ) (import src) v.args
+              else
+                import src
             else
               src;
         in
