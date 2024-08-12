@@ -2,6 +2,7 @@
 name = "test"
 path = "import"
 
-[composer.features]
-atom = ["std"]
-std = []
+[core]
+features = ["std"]
+[std]
+features = []

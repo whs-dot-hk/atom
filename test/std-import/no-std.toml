@@ -2,5 +2,5 @@
 name = "test"
 path = "import"
 
-[compose.features]
-atom = [] # defualt is ["std"]
+[core]
+features = [] # default is ["std"]
