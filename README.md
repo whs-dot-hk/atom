@@ -78,7 +78,7 @@ in
 }
 ```
 
-## TOML Manifest (Unstable)
+## Ekala TOML Manifest (Unstable)
 
 > ⚠️ The manifest's structure _will_ change as the project develops.
 
