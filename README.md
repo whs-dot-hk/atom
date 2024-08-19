@@ -128,11 +128,11 @@ fromManifest {
 } ./src/dev.toml # or specific manifest file
 ```
 
-## Future Directions: Ekala CLI (`eka`)
+## Future Directions: Ekala Platform
 
-Atom lays the groundwork for `eka`, a key component of the Ekala project. Ekala aims to create a unified platform leveraging store-based build systems.
+Atom lays the groundwork for the Ekala platform, which builds upon the innovative store-based build and distribution model introduced by Nix.
 
-The Ekala project, through `eka` and its backend Eos API, targets improvements in software development, deployment, and system management at scale.
+The Ekala project, through the `eka` CLI and its backend Eos API, aims to create a unified platform that leverages the potential of this model to enhance software development, deployment, and system management at scale.
 
 For details on `eka`, see the [eka README](https://github.com/ekala-project/eka/blob/master/README.md).
 
