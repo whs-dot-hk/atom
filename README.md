@@ -1,10 +1,10 @@
-# Nix Module System (Atom)
+# Atom: Next-Gen Nix Module System
 
 > ⚠️ Warning: WIP Alpha ⚠️
->
-> Aiming to deprecate or reform the NixOS module mechanism.
 
-A lean, efficient module system for Nix that prioritizes simplicity and efficiency.
+Atom is a lean, efficient module system for Nix, designed to be independently useful. As a standalone tool, it offers powerful modular capabilities for Nix users today. Simultaneously, it acts as the inaugural component of the Ekala project, laying the groundwork for future ecosystem development.
+
+Atom's design facilitates a novel capability in the Nix ecosystem: the potential for efficient operations without full Nix expression evaluation. This feature, not currently available in standard Nix tooling, is specifically crafted to be leveraged by higher-level tooling in the forthcoming Ekala ecosystem.
 
 ## Module Structure
 
@@ -128,21 +128,12 @@ fromManifest {
 } ./src/dev.toml # or specific manifest file
 ```
 
-## Future CLI: `eka`
+## Future Directions: Ekala CLI (`eka`)
 
-Atom is designed with a future CLI tool, tentatively named 'eka', in mind. This CLI will:
+Atom lays the groundwork for `eka`, a key component of the Ekala project. Ekala aims to create a unified platform leveraging store-based build systems.
 
-- Respect the TOML manifest
-- Allow schema extension via a language-agnostic plugin interface
-- Provide advanced static analysis capabilities
-- Enable efficient evaluation and build processes
-- Support multiple backends, with Nix being one of them
-- Capitalize on the self-contained structure of Atoms.
+The Ekala project, through `eka` and its backend Eos API, targets improvements in software development, deployment, and system management at scale.
 
-For more details and ongoing discussions, see:
+For details on `eka`, see the [eka README](https://github.com/ekala-project/eka/blob/master/README.md).
 
-- [Efficient Build Pipelines: #20](https://github.com/ekala-project/atom/issues/20)
-- [Fetching with JOSH: #25](https://github.com/ekala-project/atom/issues/25)
-- [Isolated Evaluation: #27](https://github.com/ekala-project/atom/issues/27)
-
-The research & development of 'eka' is part of our broader vision to create a more integrated, efficient, secure, and flexible development environment.
+For ongoing discussions and updates, visit our [Issues](https://github.com/ekala-project/atom/issues) page.
