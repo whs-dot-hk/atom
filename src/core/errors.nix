@@ -18,6 +18,26 @@ let
 in
 {
   inherit warn;
+
+  context =
+    debug: msg: value:
+    if debug then l.trace msg value else value;
+  modPath =
+    par: path:
+    let
+
+      modFromDir =
+        path: l.concatStringsSep "." (l.tail (l.filter l.isString (l.split "/" (toString path))));
+      stripParentDir =
+        p: p':
+        let
+          len = l.stringLength (toString p);
+          res = l.substring (len + 1) (-1) (toString p');
+        in
+        /. + res;
+
+    in
+    modFromDir (stripParentDir par path);
   import = abort "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
   fetch = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
   system = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
