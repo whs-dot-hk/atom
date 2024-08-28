@@ -16,7 +16,7 @@ Modules in Atom are directories with a `mod.nix` file containing an attribute se
 - **Public/Private Distinction**: Capitalized members denote public exports; all others are private by default.
 - **Static File Access**: `mod.outPath` provides access to non-Nix files, excluding submodules, offering an efficient file system API with a well-defined scope.
 
-These features collectively provide a structured, introspectable, and efficient module system that enhances code organization and maintainability in Nix projects.
+These features collectively provide a structured, introspectable, and efficient module system that enhances code organization and maintainability in Nix projects, while remaining otherwise unopinionated.
 
 ## Scoping Examples
 
