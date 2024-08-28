@@ -83,7 +83,7 @@ in
 > #### ⚠️ The manifest's structure _will_ change as the project develops.
 >
 > The current in-repo manifest implementation is for demonstration purposes only.
-> The canonical manifest parser will exist in [`eka`](https://github.com/ekala-project/eka).
+> The canonical manifest validation layer exists in [`eka`](https://github.com/ekala-project/eka).
 
 Each atom is defined by a TOML manifest file, enhancing dependency tracking and separation of concerns:
 
@@ -104,7 +104,10 @@ args = [{}]
 
 ## Usage (Unstable)
 
-> ⚠️ [Implementation detail](./src/atom/fromManifest.nix): The TOML Manifest is the true entrypoint. Future CLI will respect this.
+> #### ⚠️ [Implementation detail](./src/atom/fromManifest.nix)
+>
+> While it is conceptually useful to keep Atom minimal and in pure Nix, something like the code
+> below should be implicit for user facing interfaces, e.g. [`eka`](https://github.com/ekala-project/eka).
 
 ```nix
 let
@@ -113,9 +116,9 @@ let
 in
 fromManifest {
   features = [
-    # optional feature flags
+    # enabled flags
   ];
-} ./src/dev.toml # or specific manifest file
+} ./src/dev.toml
 ```
 
 ## Future Directions: Ekala Platform
