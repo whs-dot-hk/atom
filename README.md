@@ -18,7 +18,7 @@ Modules in Atom are directories with a `mod.nix` file containing an attribute se
 
 These features collectively provide a structured, introspectable, and efficient module system that enhances code organization and maintainability in Nix projects, while remaining otherwise unopinionated.
 
-## Scoping Examples
+## A Module's Scope
 
 ### `mod`: Current Module
 
@@ -29,7 +29,7 @@ These features collectively provide a structured, introspectable, and efficient 
   Like = mod.like;
 }
 
-# string/toLowerCase.nix
+# string/toLowerCase.nix: mod.toLowerCase
 str:
 let
   head = std.substring 0 1 str;
@@ -38,7 +38,7 @@ in
 "${mod.ToLower head}${tail}"
 ```
 
-### `pre`: Parent Module Chain
+### `pre`: Parent Module Chain (Recursive)
 
 ```nix
 # parent/mod.nix
@@ -102,20 +102,7 @@ import = true
 args = [{}]
 ```
 
-### Demonstrated Components:
-
-- Atom metadata
-- Feature flags
-- Legacy Nix expression fetching (e.g., nixpkgs)
-
-Atoms are designed to accommodate a future plugin-based schema extension system, envisioned for the theoretical CLI: [`eka`](#future-cli-eka). In this proposed framework, `[atom]` and `[features]` would serve as foundational elements, while `[fetch]` illustrates a potential Nix-specific plugin feature.
-
-Exact dependency and composition semantics are still evolving. For updates relating to the high-level format, see:
-
-- [Compositional Semantics #19](https://github.com/ekala-project/atom/issues/19)
-- [Manifest Stabilization #31](https://github.com/ekala-project/atom/issues/31)
-
-## Usage
+## Usage (Unstable)
 
 > ⚠️ [Implementation detail](./src/atom/fromManifest.nix): The TOML Manifest is the true entrypoint. Future CLI will respect this.
 
@@ -135,7 +122,7 @@ fromManifest {
 
 Atom lays the groundwork for the Ekala platform, which builds upon the innovative store-based build and distribution model introduced by Nix.
 
-The Ekala project, through the `eka` CLI and its backend Eos API, aims to create a unified platform that leverages the potential of this model to enhance software development, deployment, and system management at scale.
+The Ekala project, through the `eka` CLI and its backend Eos API, aims to craft an open, unified platform that leverages the potential of this model to enhance software development, deployment, and system management at scale.
 
 For details on `eka`, see the [eka README](https://github.com/ekala-project/eka/blob/master/README.md).
 
