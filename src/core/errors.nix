@@ -21,10 +21,10 @@ in
   import = abort "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
   fetch = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
   system = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
-  time = warn "currentTime: Ignoring request for current time, returning: 0";
-  nixPath = warn "nixPath: ignoring impure NIX_PATH request, returning: []";
+  time = _: warn "currentTime: Ignoring request for current time, returning: 0";
+  nixPath = _: warn "nixPath: ignoring impure NIX_PATH request, returning: []";
   storePath = abort "Making explicit dependencies on store paths is illegal.";
-  getEnv = warn "getEnv: ignoring request to access impure envvar, returning: \"\"";
+  getEnv = _: warn "getEnv: ignoring request to access impure envvar, returning: \"\"";
   missingName =
     file:
     let
