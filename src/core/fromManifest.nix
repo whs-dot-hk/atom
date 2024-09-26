@@ -86,7 +86,7 @@ let
   meta = atom.meta or { };
 
 in
-(mod.compose) {
+mod.compose {
   inherit extern __internal__test config;
   features = features';
   coreFeatures =

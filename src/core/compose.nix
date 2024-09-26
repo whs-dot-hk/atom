@@ -105,15 +105,15 @@ let
           scope' = with src; {
             inherit __atom;
             mod = self';
-            builtins = errors.builtins;
+            builtins = std;
             import = errors.import;
             scopedImport = errors.import;
             __fetchurl = errors.fetch;
             __currentSystem = errors.system;
-            __currentTime = errors.time;
-            __nixPath = errors.nixPath;
+            __currentTime = errors.time 0;
+            __nixPath = errors.nixPath [ ];
             __storePath = errors.storePath;
-            __getEnv = errors.getEnv;
+            __getEnv = errors.getEnv "";
             __getFlake = errors.import;
           };
 
@@ -195,17 +195,7 @@ let
       fixed = src.fix f null dir;
     in
     src.set.inject fixed [
-      (
-        {
-          _if = __isStd__;
-        }
-        // src.pureBuiltins
-        // {
-          path = fixed.path // {
-            __functor = _: l.path;
-          };
-        }
-      )
+      ({ _if = __isStd__; } // src.pureBuiltinsForStd fixed)
       {
         _if = __isStd__ && l.elem "lib" __atom.features.resolved.atom;
         inherit (extern) lib;
@@ -221,7 +211,7 @@ in
 assert
   !__internal__test
   # older versions of Nix don't have the `warn` builtin
-  || l.warn or l.trace ''
+  || src.errors.warn ''
     in ${toString ./default.nix}:
     Internal testing functionality is enabled via the `__test` boolean.
     This should never be `true` except in internal test runs.

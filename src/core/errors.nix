@@ -4,6 +4,7 @@ let
   sublist = scopedImport { std = builtins; } ../std/list/sublist.nix;
   digits = n: l.stringLength (l.toString n);
   spaces = n: toString (l.genList (x: " ") n);
+  warn = l.warn or l.trace;
   right =
     str:
     let
@@ -17,13 +18,12 @@ let
 in
 {
   import = abort "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
-  builtins = l.warn "Please access builtins uniformly via the `std` scope.";
   fetch = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
   system = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
-  time = abort "Accessing the current time is impure & illegal.";
-  nixPath = abort "The NIX_PATH is an impure feature, and therefore illegal.";
+  time = warn "currentTime: Ignoring request for current time, returning: 0";
+  nixPath = warn "nixPath: ignoring impure NIX_PATH request, returning: []";
   storePath = abort "Making explicit dependencies on store paths is illegal.";
-  getEnv = abort "Accessing environmental variables is impure & illegal.";
+  getEnv = warn "getEnv: ignoring request to access impure envvar, returning: \"\"";
   missingName =
     file:
     let

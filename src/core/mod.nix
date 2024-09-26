@@ -83,7 +83,28 @@ rec {
 
   set.inject = l.foldl' (acc: x: acc // when x);
 
-  pureBuiltins = filterMap (k: v: if stdFilter k != null then null else { ${k} = v; }) builtins;
+  pureBuiltinsForStd =
+    std:
+    filterMap (
+      builtin: f:
+      if stdFilter builtin != null then
+        null
+      else
+        {
+          ${builtin} =
+            if std ? ${builtin} then
+              if l.isAttrs std.${builtin} then
+                ## if std exports builtins named the same as a builtin funciton
+                ## such as `std.path`, then rexport std's version as a set
+                std.${builtin} // { __functor = _: f; }
+              else
+                ## if std's output is not an attribute set, prefer its version
+                std.${builtin}
+            else
+              ## re-export all non-conflicting builtins
+              f;
+        }
+    ) builtins;
 
   hasMod = contents: contents."mod.nix" or null == "regular";
 
