@@ -61,7 +61,6 @@ in
   config,
   extern ? { },
   features ? [ ],
-  debug ? false,
   # internal features of the composer function
   stdFeatures ? src.stdToml.features.default or [ ],
   coreFeatures ? src.coreToml.features.default,
@@ -91,11 +90,7 @@ let
     };
   };
 
-  debugMsg =
-    path:
-    "in ${config.atom.name}${if config.atom ? version then "-${config.atom.version}" else ""}${
-      if path == "" then "" else " at ${path}"
-    }";
+  msg = src.errors.debugMsg config;
 
   f =
     f: pre: dir:
@@ -171,7 +166,7 @@ let
               let
                 trace = src.errors.modPath par dir;
               in
-              src.errors.context debug (debugMsg "${trace}.${file.name}") member;
+              src.errors.context (msg "${trace}.${file.name}") member;
           }
         else
           null # Ignore other file types
@@ -191,7 +186,7 @@ let
           trace = src.errors.modPath par dir;
         in
         assert src.modIsValid module dir;
-        src.filterMap g contents // (src.errors.context debug (debugMsg trace) module);
+        src.filterMap g contents // (src.errors.context (msg trace) module);
 
     in
     if src.hasMod contents then

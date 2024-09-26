@@ -19,9 +19,13 @@ in
 {
   inherit warn;
 
-  context =
-    debug: msg: value:
-    if debug then l.trace msg value else value;
+  debugMsg =
+    config: path:
+    "in ${config.atom.name}${if config.atom ? version then "-${config.atom.version}" else ""}${
+      if path == "" then "" else " at ${path}"
+    }";
+
+  context = msg: value: l.traceVerbose msg value;
   modPath =
     par: path:
     let
