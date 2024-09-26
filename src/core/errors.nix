@@ -1,22 +1,23 @@
 let
+  l = builtins;
   imap = scopedImport { std = builtins; } ../std/list/imap.nix;
   sublist = scopedImport { std = builtins; } ../std/list/sublist.nix;
-  digits = n: builtins.stringLength (builtins.toString n);
-  spaces = n: toString (builtins.genList (x: " ") n);
+  digits = n: l.stringLength (l.toString n);
+  spaces = n: toString (l.genList (x: " ") n);
   right =
     str:
     let
-      match = builtins.match "^( *)[^ ].*" str;
+      match = l.match "^( *)[^ ].*" str;
     in
     if match == null then
-      builtins.stringLength str # If the string is all spaces
+      l.stringLength str # If the string is all spaces
     else
-      builtins.stringLength (builtins.head match);
+      l.stringLength (l.head match);
 
 in
 {
   import = abort "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
-  builtins = abort "Please access builtins uniformly via the `std` scope.";
+  builtins = l.warn "Please access builtins uniformly via the `std` scope.";
   fetch = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
   system = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
   time = abort "Accessing the current time is impure & illegal.";
@@ -27,14 +28,14 @@ in
     file:
     let
       name = baseNameOf file;
-      contents = builtins.readFile file;
-      lines = builtins.filter builtins.isString (builtins.split "\n" contents);
-      l = builtins.length lines;
+      contents = l.readFile file;
+      lines = l.filter l.isString (l.split "\n" contents);
+      l = l.length lines;
       num = imap (i: line: { inherit i line; }) lines;
-      atom = builtins.filter (x: builtins.match ".*\\[atom].*" x.line != null) num;
+      atom = l.filter (x: l.match ".*\\[atom].*" x.line != null) num;
       i =
         if atom != [ ] then
-          (builtins.head atom).i
+          (l.head atom).i
         else
           throw ''
             missing required `[atom]` section
@@ -44,9 +45,9 @@ in
     in
     throw ''
       missing required field `name`
-       --> ${name}:${toString (i + 1)}:${toString ((right (builtins.elemAt lines i)) + 1)}
+       --> ${name}:${toString (i + 1)}:${toString ((right (l.elemAt lines i)) + 1)}
 
-      ${builtins.concatStringsSep "\n" (
+      ${l.concatStringsSep "\n" (
         map (
           x:
           let
