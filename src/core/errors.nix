@@ -17,6 +17,7 @@ let
 
 in
 {
+  inherit warn;
   import = abort "Importing arbitrary Nix files is forbidden. Declare your dependencies via the module system instead.";
   fetch = abort "Ad hoc fetching is illegal. Declare dependencies statically in the manifest instead.";
   system = abort "Accessing the current system is impure. Declare supported systems in the manifest.";
