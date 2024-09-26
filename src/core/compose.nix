@@ -70,7 +70,7 @@ in
 }:
 dir':
 let
-  dir = src.prepDir dir';
+  par = src.prepDir dir';
 
   std = src.readStd {
     features = stdFeatures;
@@ -89,6 +89,8 @@ let
       };
     };
   };
+
+  msg = src.errors.debugMsg config;
 
   f =
     f: pre: dir:
@@ -153,13 +155,19 @@ let
         let
           path = src.path.make dir name;
           file = src.file.parse name;
-          member = l.path { inherit path name; };
+          member = Import (l.path { inherit path name; });
           module = src.path.make path "mod.nix";
         in
         if type == "directory" && l.pathExists module then
           { ${name} = f ((src.lowerKeys self) // src.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
-          { ${file.name} = Import member; }
+          {
+            ${file.name} =
+              let
+                trace = src.errors.modPath par dir;
+              in
+              src.errors.context (msg "${trace}.${file.name}") member;
+          }
         else
           null # Ignore other file types
       ;
@@ -169,14 +177,16 @@ let
       self =
         let
           path = src.path.make dir "mod.nix";
-          module = l.path {
-            inherit path;
-            name = baseNameOf path;
-          };
-          mod = Import module;
+          module = Import (
+            l.path {
+              inherit path;
+              name = baseNameOf path;
+            }
+          );
+          trace = src.errors.modPath par dir;
         in
-        assert src.modIsValid mod dir;
-        src.filterMap g contents // mod;
+        assert src.modIsValid module dir;
+        src.filterMap g contents // (src.errors.context (msg trace) module);
 
     in
     if src.hasMod contents then
@@ -187,12 +197,12 @@ let
 
   atom' = l.removeAttrs (extern // atom // { inherit extern; }) [
     "atom"
-    (baseNameOf dir)
+    (baseNameOf par)
   ];
 
   atom =
     let
-      fixed = src.fix f null dir;
+      fixed = src.fix f null par;
     in
     src.set.inject fixed [
       ({ _if = __isStd__; } // src.pureBuiltinsForStd fixed)
