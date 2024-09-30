@@ -1,5 +1,6 @@
 [atom]
-name = "dev"
+id = "dev"
+version = "0.2.0"
 
 [fetch.pkgs]
 name = "nixpkgs"

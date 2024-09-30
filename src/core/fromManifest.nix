@@ -28,7 +28,8 @@ let
   file = builtins.readFile path;
   config = builtins.fromTOML file;
   atom = config.atom or { };
-  name = atom.name or (mod.errors.missingName path);
+  id = builtins.seq version (atom.id or (mod.errors.missingAtom path' "id"));
+  version = atom.version or (mod.errors.missingAtom path' "version");
 
   core = config.core or { };
   std = config.std or { };
@@ -43,7 +44,7 @@ let
   backend = config.backend or { };
   nix = backend.nix or { };
 
-  root = atom.path or name;
+  root = builtins.seq id (atom.path or id);
   extern =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet

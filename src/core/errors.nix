@@ -21,7 +21,7 @@ in
 
   debugMsg =
     config: path:
-    "in ${config.atom.name}${if config.atom ? version then "-${config.atom.version}" else ""}${
+    "in ${config.atom.id}${if config.atom ? version then "-${config.atom.version}" else ""}${
       if path == "" then "" else " at ${path}"
     }";
 
@@ -49,15 +49,15 @@ in
   nixPath = _: warn "nixPath: ignoring impure NIX_PATH request, returning: []";
   storePath = abort "Making explicit dependencies on store paths is illegal.";
   getEnv = _: warn "getEnv: ignoring request to access impure envvar, returning: \"\"";
-  missingName =
-    file:
+  missingAtom =
+    file: field:
     let
-      name = baseNameOf file;
+      name = toString file;
       contents = l.readFile file;
       lines = l.filter l.isString (l.split "\n" contents);
-      l = l.length lines;
+      len = l.length lines;
       num = imap (i: line: { inherit i line; }) lines;
-      atom = l.filter (x: l.match ".*\\[atom].*" x.line != null) num;
+      atom = l.filter (x: l.match "[^#]*\\[atom].*" x.line != null) num;
       i =
         if atom != [ ] then
           (l.head atom).i
@@ -66,17 +66,17 @@ in
             missing required `[atom]` section
              --> ${name}
           '';
-      g = if l - i < 5 then num else sublist i 4 num;
+      g = if len - i < 5 then num else sublist i 4 num;
     in
     throw ''
-      missing required field `name`
+      missing required field `${field}`
        --> ${name}:${toString (i + 1)}:${toString ((right (l.elemAt lines i)) + 1)}
 
       ${l.concatStringsSep "\n" (
         map (
           x:
           let
-            pad = spaces ((digits l) - (digits (x.i + 1)));
+            pad = spaces ((digits len) - (digits (x.i + 1)));
           in
           "${toString (x.i + 1)}${pad} | ${if x.i == i then "${x.line} <~~~" else x.line}"
         ) g
