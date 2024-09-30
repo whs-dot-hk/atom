@@ -72,7 +72,7 @@ dir':
 let
   par = src.prepDir dir';
 
-  std = src.readStd {
+  std = src.importStd {
     features = stdFeatures;
     inherit __internal__test;
   } ../std.toml;

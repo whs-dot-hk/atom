@@ -4,7 +4,7 @@
 # to keep the core impelementation clean
 let
   l = builtins;
-  fromManifest = import ./fromManifest.nix;
+  importAtom = import ./importAtom.nix;
   fix = import ../std/fix.nix;
   when = scopedImport { std = builtins; } ../std/set/when.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
@@ -71,7 +71,7 @@ rec {
       );
     };
 
-  readStd = opts: fromManifest { inherit (opts) __internal__test features; };
+  importStd = opts: importAtom { inherit (opts) __internal__test features; };
 
   modIsValid =
     mod: dir:

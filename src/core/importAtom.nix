@@ -1,9 +1,9 @@
 /**
-  # `fromManifest`
+  # `importAtom`
 
   > #### ⚠️ Warning ⚠️
   >
-  > `fromManifests` current implementation should be reduced close to:
+  > `importAtoms` current implementation should be reduced close to:
   > ```nix
   >   compose <| std.fromJSON
   > ```

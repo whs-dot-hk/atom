@@ -104,7 +104,7 @@ args = [{}]
 
 ## Usage (Unstable)
 
-> #### ⚠️ [Implementation detail](./src/atom/fromManifest.nix)
+> #### ⚠️ [Implementation detail](./src/atom/importAtom.nix)
 >
 > While it is conceptually useful to keep Atom minimal and in pure Nix, something like the code
 > below should be implicit for user facing interfaces, e.g. [`eka`](https://github.com/ekala-project/eka).
@@ -112,9 +112,9 @@ args = [{}]
 ```nix
 let
   atom = builtins.fetchGit "https://github.com/ekala-project/atom";
-  fromManifest = import "${atom}/src/core/fromManifest.nix";
+  importAtom = import "${atom}/src/core/importAtom.nix";
 in
-fromManifest {
+importAtom {
   features = [
     # enabled flags
   ];
