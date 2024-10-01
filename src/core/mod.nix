@@ -15,12 +15,13 @@ let
     std = builtins;
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile ../std.toml);
-  coreToml = l.fromTOML (l.readFile ../core.toml);
+  stdToml = l.fromTOML (l.readFile ../std.atom);
+  coreToml = l.fromTOML (l.readFile ../core.atom);
 in
 rec {
   inherit
     fix
+    parse
     filterMap
     stdFilter
     stdToml

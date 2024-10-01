@@ -44,7 +44,13 @@ let
   backend = config.backend or { };
   nix = backend.nix or { };
 
-  root = builtins.seq id (atom.path or id);
+  root = mod.prepDir (dirOf path);
+  src = builtins.seq id (
+    let
+      file = mod.parse (baseNameOf path);
+    in
+    file.name
+  );
   extern =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
@@ -88,7 +94,13 @@ let
 
 in
 mod.compose {
-  inherit extern __internal__test config;
+  inherit
+    extern
+    __internal__test
+    config
+    root
+    src
+    ;
   features = features';
   coreFeatures =
     let
@@ -102,4 +114,4 @@ mod.compose {
     mod.features.resolve mod.stdToml.features feat;
 
   __isStd__ = meta.__is_std__ or false;
-} (dirOf path + "/${root}")
+}

@@ -1,6 +1,6 @@
 [atom]
-name = "features"
-path = "resolve"
+id = "features"
+version = "0.1.0"
 
 [features]
 a = ["b", "c"]

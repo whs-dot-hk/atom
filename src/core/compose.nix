@@ -55,30 +55,31 @@
 */
 let
   l = builtins;
-  src = import ./mod.nix;
+  core = import ./mod.nix;
 in
 {
+  src,
+  root,
   config,
   extern ? { },
   features ? [ ],
   # internal features of the composer function
-  stdFeatures ? src.stdToml.features.default or [ ],
-  coreFeatures ? src.coreToml.features.default,
+  stdFeatures ? core.stdToml.features.default or [ ],
+  coreFeatures ? core.coreToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
 }:
-dir':
 let
-  par = src.prepDir dir';
+  par = (root + "/${src}");
 
-  std = src.importStd {
+  std = core.importStd {
     features = stdFeatures;
     inherit __internal__test;
-  } ../std.toml;
+  } ../std.atom;
 
-  coreFeatures' = src.features.resolve src.coreToml.features coreFeatures;
-  stdFeatures' = src.features.resolve src.stdToml.features stdFeatures;
+  coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
+  stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
 
   __atom = config // {
     features = config.features or { } // {
@@ -90,7 +91,7 @@ let
     };
   };
 
-  msg = src.errors.debugMsg config;
+  msg = core.errors.debugMsg config;
 
   f =
     f: pre: dir:
@@ -104,9 +105,9 @@ let
 
       scope =
         let
-          scope' = with src; {
+          scope' = with core; {
             inherit __atom;
-            mod = self';
+            mod = modScope;
             builtins = std;
             import = errors.import;
             scopedImport = errors.import;
@@ -119,7 +120,7 @@ let
             __getFlake = errors.import;
           };
 
-          scope'' = src.set.inject scope' [
+          scope'' = core.set.inject scope' [
             preOpt
             {
               _if = !__isStd__ && l.elem "std" coreFeatures';
@@ -127,7 +128,7 @@ let
             }
             {
               _if = !__isStd__;
-              atom = atom';
+              atom = atomScope;
             }
             {
               _if = __isStd__;
@@ -141,7 +142,8 @@ let
                 # a copy of the global scope, for testing if values exist
                 # for our internal testing functions
                 scope = scope'';
-                inherit src __isStd__ __internal__test;
+                inherit __isStd__ __internal__test;
+                src = core;
               };
             }
           ];
@@ -153,59 +155,59 @@ let
       g =
         name: type:
         let
-          path = src.path.make dir name;
-          file = src.file.parse name;
+          path = core.path.make dir name;
+          file = core.file.parse name;
           member = Import (l.path { inherit path name; });
-          module = src.path.make path "mod.nix";
+          module = core.path.make path "mod.nix";
         in
         if type == "directory" && l.pathExists module then
-          { ${name} = f ((src.lowerKeys self) // src.set.when preOpt) path; }
+          { ${name} = f ((core.lowerKeys mod) // core.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           {
             ${file.name} =
               let
-                trace = src.errors.modPath par dir;
+                trace = core.errors.modPath par dir;
               in
-              src.errors.context (msg "${trace}.${file.name}") member;
+              core.errors.context (msg "${trace}.${file.name}") member;
           }
         else
           null # Ignore other file types
       ;
 
-      self' = src.lowerKeys (l.removeAttrs self [ "mod" ] // { outPath = src.rmNixSrcs dir; });
+      modScope = core.lowerKeys (l.removeAttrs mod [ "mod" ] // { outPath = core.rmNixSrcs dir; });
 
-      self =
+      mod =
         let
-          path = src.path.make dir "mod.nix";
+          path = core.path.make dir "mod.nix";
           module = Import (
             l.path {
               inherit path;
               name = baseNameOf path;
             }
           );
-          trace = src.errors.modPath par dir;
+          trace = core.errors.modPath par dir;
         in
-        assert src.modIsValid module dir;
-        src.filterMap g contents // (src.errors.context (msg trace) module);
+        assert core.modIsValid module dir;
+        core.filterMap g contents // (core.errors.context (msg trace) module);
 
     in
-    if src.hasMod contents then
-      src.collectPublic self
+    if core.hasMod contents then
+      core.collectPublic mod
     else
       # Base case: no module
       { };
 
-  atom' = l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = l.removeAttrs (extern // atom // { inherit extern; }) [
     "atom"
     (baseNameOf par)
   ];
 
   atom =
     let
-      fixed = src.fix f null par;
+      fixed = core.fix f null par;
     in
-    src.set.inject fixed [
-      ({ _if = __isStd__; } // src.pureBuiltinsForStd fixed)
+    core.set.inject fixed [
+      ({ _if = __isStd__; } // core.pureBuiltinsForStd fixed)
       {
         _if = __isStd__ && l.elem "lib" __atom.features.resolved.atom;
         inherit (extern) lib;
@@ -221,7 +223,7 @@ in
 assert
   !__internal__test
   # older versions of Nix don't have the `warn` builtin
-  || src.errors.warn ''
+  || core.errors.warn ''
     in ${toString ./default.nix}:
     Internal testing functionality is enabled via the `__test` boolean.
     This should never be `true` except in internal test runs.
