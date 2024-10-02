@@ -48,8 +48,9 @@ let
   src = builtins.seq id (
     let
       file = mod.parse (baseNameOf path);
+      len = builtins.stringLength file.name;
     in
-    file.name
+    builtins.substring 0 (len - 1) file.name
   );
   extern =
     let

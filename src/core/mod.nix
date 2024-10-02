@@ -15,8 +15,8 @@ let
     std = builtins;
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile ../std.atom);
-  coreToml = l.fromTOML (l.readFile ../core.atom);
+  stdToml = l.fromTOML (l.readFile (../. + "/std@.toml"));
+  coreToml = l.fromTOML (l.readFile (../. + "/core@.toml"));
 in
 rec {
   inherit

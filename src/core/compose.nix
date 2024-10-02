@@ -76,7 +76,7 @@ let
   std = core.importStd {
     features = stdFeatures;
     inherit __internal__test;
-  } ../std.atom;
+  } (../. + "/std@.toml");
 
   coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
   stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
