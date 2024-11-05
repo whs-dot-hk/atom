@@ -2,9 +2,9 @@
 
 > ⚠️ Warning: WIP Alpha ⚠️
 
-Atom is a lean, efficient module system for Nix, designed to be independently useful. As a standalone tool, it offers powerful modular capabilities for Nix users today. Simultaneously, it acts as the inaugural component of the Ekala project, laying the groundwork for future ecosystem development.
+Atom is a module system for Nix that enforces bounded code structures, enabling complete static analysis without evaluation. While standard Nix code requires full evaluation to understand its structure, Atom-based modules can be analyzed and reasoned about statically, allowing tools to make strong associations about code relationships and dependencies _before_ runtime.
 
-Atom's design facilitates a novel capability in the Nix ecosystem: the potential for efficient operations without full Nix expression evaluation. This feature, not currently available in standard Nix tooling, is specifically crafted to be leveraged by higher-level tooling in the forthcoming Ekala ecosystem.
+As a standalone tool, Atom provides immediate value to Nix users through its module system. It also serves as the foundation for the broader Ekala project, where its static analyzability enables powerful developer tooling such as LSPs or the [eka][eka] evaluation frontend. This will also enable efficient caching strategies previously infeasible in the Nix ecosystem.
 
 ## Module Structure
 
