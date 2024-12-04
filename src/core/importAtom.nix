@@ -18,6 +18,7 @@
 {
   features ? null,
   __internal__test ? false,
+  mySrc ? null,
 }:
 path':
 let
@@ -101,6 +102,7 @@ mod.compose {
     config
     root
     src
+    mySrc
     ;
   features = features';
   coreFeatures =

@@ -59,6 +59,7 @@ let
 in
 {
   src,
+  mySrc,
   root,
   config,
   extern ? { },
@@ -197,10 +198,10 @@ let
       # Base case: no module
       { };
 
-  atomScope = l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = (l.removeAttrs (extern // atom // { inherit extern; }) [
     "atom"
     (baseNameOf par)
-  ];
+  ]) // { mySrc = core.rmNixSrcs mySrc; };
 
   atom =
     let
