@@ -198,10 +198,13 @@ let
       # Base case: no module
       { };
 
-  atomScope = (l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = let
+    mySrc' = if mySrc != null then { mySrc = core.rmNixSrcs mySrc; } else { };
+  in
+  (l.removeAttrs (extern // atom // { inherit extern; }) [
     "atom"
     (baseNameOf par)
-  ]) // { mySrc = core.rmNixSrcs mySrc; };
+  ]) // mySrc';
 
   atom =
     let
