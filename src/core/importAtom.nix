@@ -43,8 +43,8 @@ let
 
   backend = config.backend or { };
   nix = backend.nix or { };
+  defaultFetcher = nix.fetcher or "native"; # native doesn't exist yet
 
-  root = mod.prepDir (dirOf path);
   src = builtins.seq id (
     let
       file = mod.parse (baseNameOf path);
@@ -54,20 +54,20 @@ let
   );
   extern =
     let
-      fetcher = nix.fetcher or "native"; # native doesn't exist yet
-      conf = config.fetcher or { };
-      f = conf.${fetcher} or { };
-      root = f.root or "npins";
+      fetcherConfigs = config.fetcher or { };
     in
-    if fetcher == "npins" then
+    mod.filterMap (
+      k: v:
       let
-        pins = import (dirOf path + "/${root}");
-      in
-      mod.filterMap (
-        k: v:
-        let
-          src = "${pins.${v.name or k}}/${v.subdir or ""}";
-          val =
+        fetcher = v.fetcher or defaultFetcher;
+        fetcherConfig = fetcherConfigs.${fetcher} or { };
+        val = 
+          if fetcher == "npins" then
+            let
+              npinsRoot = dirOf path + "/${fetcherConfig.root or "npins"}";
+              pins = import npinsRoot;
+              src = "${pins.${v.name or k}}/${v.subdir or ""}";
+            in
             if v.import or false then
               if v.args or [ ] != [ ] then
                 builtins.foldl' (
@@ -80,16 +80,22 @@ let
               else
                 import src
             else
-              src;
-        in
-        if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
-          { "${k}" = val; }
-        else
-          null
-      ) config.fetch or { }
-    # else if fetcher = "native", etc
-    else
-      { };
+              src
+          else if fetcher == "local" then
+            let
+              localRoot = dirOf path + "/${fetcherConfig.root or ""}";
+              localPath = mod.path.make localRoot (v.path or k);
+            in
+            mod.rmNixSrcs localPath
+          # else if fetcher = "native", etc
+          else
+            null;
+      in
+      if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
+        { "${k}" = val; }
+      else
+        null
+    ) config.fetch or { };
 
   meta = atom.meta or { };
 
@@ -99,9 +105,9 @@ mod.compose {
     extern
     __internal__test
     config
-    root
     src
     ;
+  root = mod.prepDir (dirOf path);
   features = features';
   coreFeatures =
     let
