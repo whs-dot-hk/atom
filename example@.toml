@@ -1,0 +1,29 @@
+[atom]
+id = "example"
+version = "0.1.0"
+
+[backend.nix]
+fetcher = "local"  # Default fetcher
+
+[fetcher.local]
+root = "."
+
+[fetcher.npins] 
+root = "npins"
+
+[fetch.source]
+path = "src"  # Uses default local fetcher
+
+[fetch.std-only]
+fetcher = "local"  # Explicit fetcher
+path = "src/std"
+
+[fetch.list]
+fetcher = "local"
+path = "src/std/list"
+
+[fetch.external-lib]
+fetcher = "npins"  # Different fetcher
+name = "my-external-lib"
+subdir = "lib"
+import = true

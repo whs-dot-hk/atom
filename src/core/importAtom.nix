@@ -16,7 +16,6 @@
   valid input (and the CLI should type check on it's end)
 */
 {
-  features ? null,
   __internal__test ? false,
 }:
 path':
@@ -31,20 +30,10 @@ let
   id = builtins.seq version (atom.id or (mod.errors.missingAtom path' "id"));
   version = atom.version or (mod.errors.missingAtom path' "version");
 
-  core = config.core or { };
-  std = config.std or { };
-
-  features' =
-    let
-      featSet = config.features or { };
-      featIn = if features == null then featSet.default or [ ] else features;
-    in
-    mod.features.resolve featSet featIn;
-
   backend = config.backend or { };
   nix = backend.nix or { };
+  defaultFetcher = nix.fetcher or "native"; # native doesn't exist yet
 
-  root = mod.prepDir (dirOf path);
   src = builtins.seq id (
     let
       file = mod.parse (baseNameOf path);
@@ -54,20 +43,20 @@ let
   );
   extern =
     let
-      fetcher = nix.fetcher or "native"; # native doesn't exist yet
-      conf = config.fetcher or { };
-      f = conf.${fetcher} or { };
-      root = f.root or "npins";
+      fetcherConfigs = config.fetcher or { };
     in
-    if fetcher == "npins" then
+    mod.filterMap (
+      k: v:
       let
-        pins = import (dirOf path + "/${root}");
-      in
-      mod.filterMap (
-        k: v:
-        let
-          src = "${pins.${v.name or k}}/${v.subdir or ""}";
-          val =
+        fetcher = v.fetcher or defaultFetcher;
+        fetcherConfig = fetcherConfigs.${fetcher} or { };
+        val = 
+          if fetcher == "npins" then
+            let
+              npinsRoot = dirOf path + "/${fetcherConfig.root or "npins"}";
+              pins = import npinsRoot;
+              src = "${pins.${v.name or k}}/${v.subdir or ""}";
+            in
             if v.import or false then
               if v.args or [ ] != [ ] then
                 builtins.foldl' (
@@ -80,16 +69,19 @@ let
               else
                 import src
             else
-              src;
-        in
-        if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
-          { "${k}" = val; }
-        else
-          null
-      ) config.fetch or { }
-    # else if fetcher = "native", etc
-    else
-      { };
+              src
+          else if fetcher == "local" then
+            let
+              localRoot = dirOf path + "/${fetcherConfig.root or ""}";
+              localPath = mod.path.make localRoot (v.path or k);
+            in
+            mod.rmNixSrcs localPath
+          # else if fetcher = "native", etc
+          else
+            null;
+      in
+      { "${k}" = val; }
+    ) config.fetch or { };
 
   meta = atom.meta or { };
 
@@ -99,20 +91,8 @@ mod.compose {
     extern
     __internal__test
     config
-    root
     src
     ;
-  features = features';
-  coreFeatures =
-    let
-      feat = core.features or mod.coreToml.features.default;
-    in
-    mod.features.resolve mod.coreToml.features feat;
-  stdFeatures =
-    let
-      feat = std.features or mod.stdToml.features.default;
-    in
-    mod.features.resolve mod.stdToml.features feat;
-
+  root = mod.prepDir (dirOf path);
   __isStd__ = meta.__is_std__ or false;
 }

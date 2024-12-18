@@ -3,29 +3,28 @@
 # so instead we abstract them out here, into a manually specified "psuedo-module"
 # to keep the core impelementation clean
 let
-  l = builtins;
   importAtom = import ./importAtom.nix;
   fix = import ../std/fix.nix;
   when = scopedImport { std = builtins; } ../std/set/when.nix;
+  inject = scopedImport {
+    std = builtins;
+    mod = {
+      inherit when;
+    };
+  } ../std/set/inject.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
   make = scopedImport { std = builtins; } ../std/path/make.nix;
   parse = scopedImport { std = builtins; } ../std/file/parse.nix;
-  stdFilter = import ./stdFilter.nix;
   toLowerCase = scopedImport rec {
     std = builtins;
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile (../. + "/std@.toml"));
-  coreToml = l.fromTOML (l.readFile (../. + "/core@.toml"));
 in
 rec {
   inherit
     fix
     parse
     filterMap
-    stdFilter
-    stdToml
-    coreToml
     ;
 
   path = {
@@ -36,14 +35,12 @@ rec {
     inherit parse;
   };
   set = {
-    inherit when;
+    inherit inject when;
   };
 
   compose = import ./compose.nix;
 
   errors = import ./errors.nix;
-
-  features = import ./features.nix;
 
   lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
 
@@ -60,7 +57,7 @@ rec {
     let
       name = baseNameOf path;
     in
-    l.path {
+    builtins.path {
       inherit name path;
       filter = (
         path: type:
@@ -68,44 +65,19 @@ rec {
           file = parse path;
         in
         (type == "regular" && file.ext or null != "nix")
-        || (type == "directory" && !l.pathExists "${path}/mod.nix")
+        || (type == "directory" && !builtins.pathExists "${path}/mod.nix")
       );
     };
 
-  importStd = opts: importAtom { inherit (opts) __internal__test features; };
+  importStd = opts: importAtom { inherit (opts) __internal__test; };
 
   modIsValid =
     mod: dir:
-    l.isAttrs mod
+    builtins.isAttrs mod
     || throw ''
       The following module does not evaluate to a valid attribute set:
              ${toString dir}/mod.nix
     '';
-
-  set.inject = l.foldl' (acc: x: acc // when x);
-
-  pureBuiltinsForStd =
-    std:
-    filterMap (
-      builtin: f:
-      if stdFilter builtin != null then
-        null
-      else
-        {
-          ${builtin} =
-            if std ? ${builtin} then
-              if l.isAttrs std.${builtin} then
-                ## if std exports builtins named the same as a builtin funciton
-                ## such as `std.path`, then rexport std's version as a set
-                std.${builtin} // { __functor = _: f; }
-              else
-                ## if std's output is not an attribute set, prefer its version
-                std.${builtin}
-            else
-              ## re-export all non-conflicting builtins
-              f;
-        }
-    ) builtins;
 
   hasMod = contents: contents."mod.nix" or null == "regular";
 
@@ -116,7 +88,7 @@ rec {
     dir:
     let
       dir' =
-        if l.match "^${l.storeDir}/.+" dir != null then
+        if builtins.match "^${builtins.storeDir}/.+" dir != null then
           # this is safe because we will never reimport the full path back to the store
           # only specific files within it, which will have their own context when converted
           # back to a string.

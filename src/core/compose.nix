@@ -11,12 +11,11 @@
 
   Along the way it auto-imports any other Nix files in the same directory as `mod.nix` as module
   members. Crucially, every imported file is called with `scopedImport` provding a well defined
-  global scope for every module: `mod`, `pre`, `atom` and `std`.
+  global scope for every module: `mod`, `pre` and `atom`.
 
   `mod`: recursive reference to the current module
   `pre`: parent module, including private members
   `atom`: top-level module and it's children's public memberss
-  `std`: a standard library of generally useful Nix functions
 
   ## Future Work
 
@@ -53,50 +52,26 @@
   Until such native functionality exists, Atom provides a glimpse of these
   possibilities within the current landscape.
 */
-let
-  l = builtins;
-  core = import ./mod.nix;
-in
 {
   src,
   root,
   config,
   extern ? { },
-  features ? [ ],
-  # internal features of the composer function
-  stdFeatures ? core.stdToml.features.default or [ ],
-  coreFeatures ? core.coreToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
 }:
 let
+  core = import ./mod.nix;
+
   par = (root + "/${src}");
-
-  std = core.importStd {
-    features = stdFeatures;
-    inherit __internal__test;
-  } (../. + "/std@.toml");
-
-  coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
-  stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
-
-  __atom = config // {
-    features = config.features or { } // {
-      resolved = {
-        atom = features;
-        core = coreFeatures';
-        std = stdFeatures';
-      };
-    };
-  };
 
   msg = core.errors.debugMsg config;
 
   f =
     f: pre: dir:
     let
-      contents = l.readDir dir;
+      contents = builtins.readDir dir;
 
       preOpt = {
         _if = pre != null;
@@ -106,11 +81,10 @@ let
       scope =
         let
           scope' = with core; {
-            inherit __atom;
             mod = modScope;
-            builtins = std;
             import = errors.import;
             scopedImport = errors.import;
+            __atom = config;
             __fetchurl = errors.fetch;
             __currentSystem = errors.system;
             __currentTime = errors.time 0;
@@ -123,16 +97,8 @@ let
           scope'' = core.set.inject scope' [
             preOpt
             {
-              _if = !__isStd__ && l.elem "std" coreFeatures';
-              inherit std;
-            }
-            {
               _if = !__isStd__;
               atom = atomScope;
-            }
-            {
-              _if = __isStd__;
-              std = l.removeAttrs (extern // atom) [ "std" ];
             }
             {
               _if = __internal__test;
@@ -157,10 +123,10 @@ let
         let
           path = core.path.make dir name;
           file = core.file.parse name;
-          member = Import (l.path { inherit path name; });
+          member = Import (builtins.path { inherit path name; });
           module = core.path.make path "mod.nix";
         in
-        if type == "directory" && l.pathExists module then
+        if type == "directory" && builtins.pathExists module then
           { ${name} = f ((core.lowerKeys mod) // core.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
           {
@@ -174,13 +140,13 @@ let
           null # Ignore other file types
       ;
 
-      modScope = core.lowerKeys (l.removeAttrs mod [ "mod" ] // { outPath = core.rmNixSrcs dir; });
+      modScope = core.lowerKeys (builtins.removeAttrs mod [ "mod" ] // { outPath = core.rmNixSrcs dir; });
 
       mod =
         let
           path = core.path.make dir "mod.nix";
           module = Import (
-            l.path {
+            builtins.path {
               inherit path;
               name = baseNameOf path;
             }
@@ -197,28 +163,12 @@ let
       # Base case: no module
       { };
 
-  atomScope = l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = builtins.removeAttrs (extern // atom) [
     "atom"
     (baseNameOf par)
-  ];
+  ] // { outPath = core.rmNixSrcs root; };
 
-  atom =
-    let
-      fixed = core.fix f null par;
-    in
-    core.set.inject fixed [
-      ({ _if = __isStd__; } // core.pureBuiltinsForStd fixed)
-      {
-        _if = __isStd__ && l.elem "lib" __atom.features.resolved.atom;
-        inherit (extern) lib;
-      }
-      {
-        _if = __isStd__ && __internal__test;
-        __internal = {
-          inherit __isStd__;
-        };
-      }
-    ];
+  atom = core.fix f null par;
 in
 assert
   !__internal__test
