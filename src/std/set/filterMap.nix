@@ -24,15 +24,15 @@
   - `set`: The attribute set to filter and map.
 */
 f: set:
-std.foldl' (
+builtins.foldl' (
   acc: key:
   let
     val = f key set.${key};
   in
   if val == null then
     acc
-  else if std.isAttrs val then
+  else if builtins.isAttrs val then
     acc // val
   else
     acc // { ${key} = val; }
-) { } (std.attrNames set)
+) { } (builtins.attrNames set)

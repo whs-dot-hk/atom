@@ -37,9 +37,9 @@
 */
 start: count: list:
 let
-  len = std.length list;
+  len = builtins.length list;
 in
-std.genList (n: std.elemAt list (n + start)) (
+builtins.genList (n: builtins.elemAt list (n + start)) (
   if start >= len then
     0
   else if start + count > len then

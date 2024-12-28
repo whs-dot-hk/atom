@@ -28,4 +28,4 @@
 
   :::
 */
-f: list: std.genList (n: f n (std.elemAt list n)) (std.length list)
+f: list: builtins.genList (n: f n (builtins.elemAt list n)) (builtins.length list)

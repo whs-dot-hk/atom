@@ -58,13 +58,13 @@ pred: lhs: rhs:
 let
   f =
     attrPath:
-    std.zipAttrsWith (
+    builtins.zipAttrsWith (
       n: values:
       let
         here = attrPath ++ [ n ];
       in
-      if std.length values == 1 || pred here (std.elemAt values 1) (std.head values) then
-        std.head values
+      if builtins.length values == 1 || pred here (builtins.elemAt values 1) (builtins.head values) then
+        builtins.head values
       else
         f here values
     );

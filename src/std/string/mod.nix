@@ -2,7 +2,7 @@
   upperChars = mod.stringToChars "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   lowerChars = mod.stringToChars "abcdefghijklmnopqrstuvwxyz";
 
-  stringToChars = s: std.genList (p: std.substring p 1 s) (std.stringLength s);
+  stringToChars = s: builtins.genList (p: builtins.substring p 1 s) (builtins.stringLength s);
 
   /**
     Convert a string to lowercase by replacing all uppercase characters with their lowercase equivalents.
@@ -28,7 +28,7 @@
 
     The input string with all uppercase characters converted to lowercase.
   */
-  ToLower = std.replaceStrings mod.upperChars mod.lowerChars;
+  ToLower = builtins.replaceStrings mod.upperChars mod.lowerChars;
 
   ToLowerCase = mod.toLowerCase;
 }

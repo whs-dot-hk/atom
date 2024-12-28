@@ -27,12 +27,12 @@
 */
 abs: frag:
 let
-  s = x: std.isString x || std.isPath x || x ? outPath || x ? __toString;
-  abs' = if std.isPath abs then abs else /. + abs;
-  p = std.substring 0 1 frag;
+  s = x: builtins.isString x || builtins.isPath x || x ? outPath || x ? __toString;
+  abs' = if builtins.isPath abs then abs else /. + abs;
+  p = builtins.substring 0 1 frag;
 
   f =
-    if !(s abs && s frag && !std.isPath frag) then
+    if !(s abs && s frag && !builtins.isPath frag) then
       throw ''
         in std.path.make:
 
@@ -41,12 +41,12 @@ let
                  - frag: string
 
                got:
-                 - abs: ${std.typeOf abs}
-                 - frag: ${std.typeOf frag}
+                 - abs: ${builtins.typeOf abs}
+                 - frag: ${builtins.typeOf frag}
       ''
     else if p != "/" then
       abs' + "/${frag}"
     else
       abs' + frag;
 in
-std.addErrorContext "in call to std.path.make" f
+builtins.addErrorContext "in call to std.path.make" f

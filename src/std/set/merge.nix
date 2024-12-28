@@ -43,5 +43,5 @@
 lhs: rhs:
 mod.mergeUntil (
   path: lhs: rhs:
-  !(std.isAttrs lhs && std.isAttrs rhs)
+  !(builtins.isAttrs lhs && builtins.isAttrs rhs)
 ) lhs rhs

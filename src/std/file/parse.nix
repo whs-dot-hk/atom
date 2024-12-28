@@ -25,14 +25,14 @@
 
 str:
 let
-  s = x: std.isString x || std.isPath x || x ? outPath || x ? __toString;
-  l = std.length r;
-  r = std.match "(\\.*[^.]+)\\.?(.+)?" (baseNameOf str);
+  s = x: builtins.isString x || builtins.isPath x || x ? outPath || x ? __toString;
+  l = builtins.length r;
+  r = builtins.match "(\\.*[^.]+)\\.?(.+)?" (baseNameOf str);
 
   isnt = !s str;
 
-  name = std.head r;
-  ext = std.elemAt r 1;
+  name = builtins.head r;
+  ext = builtins.elemAt r 1;
   f =
     if isnt || r == null then
       throw ''
@@ -42,11 +42,11 @@ let
                  - str: path or string representing a file name
 
                got:
-                 - str: ${if isnt then "a ${std.typeOf str}" else str}
+                 - str: ${if isnt then "a ${builtins.typeOf str}" else str}
       ''
     else if l >= 2 && ext != null then
       { inherit name ext; }
     else
       { inherit name; };
 in
-std.addErrorContext "in call to std.file.parse" f
+builtins.addErrorContext "in call to std.file.parse" f

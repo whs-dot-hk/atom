@@ -26,7 +26,7 @@
 */
 str:
 let
-  head = std.substring 0 1 str;
-  tail = std.substring 1 (-1) str;
+  head = builtins.substring 0 1 str;
+  tail = builtins.substring 1 (-1) str;
 in
 "${mod.toLower or mod.ToLower head}${tail}"
