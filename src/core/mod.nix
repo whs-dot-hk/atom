@@ -5,19 +5,17 @@
 let
   importAtom = import ./importAtom.nix;
   fix = import ../std/fix.nix;
-  when = scopedImport { std = builtins; } ../std/set/when.nix;
+  when = scopedImport { } ../std/set/when.nix;
   inject = scopedImport {
-    std = builtins;
     mod = {
       inherit when;
     };
   } ../std/set/inject.nix;
-  filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
-  make = scopedImport { std = builtins; } ../std/path/make.nix;
-  parse = scopedImport { std = builtins; } ../std/file/parse.nix;
+  filterMap = scopedImport { } ../std/set/filterMap.nix;
+  make = scopedImport { } ../std/path/make.nix;
+  parse = scopedImport { } ../std/file/parse.nix;
   toLowerCase = scopedImport rec {
-    std = builtins;
-    mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
+    mod = scopedImport { inherit mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
 in
 rec {
